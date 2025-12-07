@@ -7,6 +7,7 @@ import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.indexreader.IndexReader;
 import com.pri1712.searchengine.wikiquerying.QueryEngine;
 
+import javax.swing.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,6 +33,9 @@ public class Main {
     static String tokenIndexOffsetPath = TOKEN_INDEX_OFFSET_PATH;
     static String docStatsPath = DOC_STATS_PATH;
 
+    private static int CHUNK_SIZE = 30;
+    private static int CHUNK_OVERLAP = 5;
+    
     public static void main(String[] args) throws IOException {
         long startTime = getStartTime();
         Map<String,String> parsedArgs = parseArgs(args);
