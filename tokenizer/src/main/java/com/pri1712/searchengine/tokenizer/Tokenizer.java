@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pri1712.searchengine.model.data.Chunk;
 import com.pri1712.searchengine.utils.BatchFileWriter;
 import com.pri1712.searchengine.parser.CheckpointManager;
 import com.pri1712.searchengine.utils.WikiDocument;
@@ -35,8 +36,8 @@ public class Tokenizer {
     private final CheckpointManager checkpointManager = new CheckpointManager(tokenizerBatchCheckpointFile);
     private final BatchFileWriter batchFileWriter = new BatchFileWriter("data/tokenized-data/");
     private List<TokenizedData> totalTokenizedData = new ArrayList<>();
-    private final String parsedFilePath;
-    private final String docStatsPath;
+    private String parsedFilePath;
+    private String docStatsPath;
     private long averageDocLength;
     private long numberOfDocuments;
     private final Map<String, Long> perDocLengths = new LinkedHashMap<>();
@@ -46,6 +47,8 @@ public class Tokenizer {
         this.parsedFilePath = parsedFilePath;
         this.docStatsPath = docStatsPath;
     }
+
+    public Tokenizer() {}
 
     public void tokenizeData() throws IOException {
         Path parsedPath = Paths.get(parsedFilePath);
@@ -77,6 +80,14 @@ public class Tokenizer {
         Files.move(tmp, docStatsFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
 
+    public void tokenizeChunk(Chunk chunk) throws IOException {
+        //tokenize and index the chunk.
+        processChunk(chunk);
+    }
+
+    private void processChunk(Chunk chunk) throws IOException {
+        TextUtils.tokenizeChunk(chunk);
+    }
     private void processFile(Path parsedFile) throws IOException {
         try (FileInputStream fis = new FileInputStream(parsedFile.toFile());
              GZIPInputStream gis = new GZIPInputStream(fis);

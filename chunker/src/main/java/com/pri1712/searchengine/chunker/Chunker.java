@@ -30,14 +30,14 @@ public class Chunker {
     public Chunker(int chunkSize, int chunkOverlap, String parsedFilePath, String chunkedFilePath, String chunkDataFilePath, String chunkIndexFilePath) throws IOException {
         this.chunkSize = chunkSize;
         this.chunkOverlap = chunkOverlap;
-
-        this.chunkDataFile = new RandomAccessFile(chunkDataFilePath,"rw");
-        this.chunkIndexFile = new RandomAccessFile(chunkIndexFilePath,"rw");
-
         this.parsedFilePath = parsedFilePath;
         parsedPath = Paths.get(parsedFilePath);
         this.chunkedFilePath = chunkedFilePath;
+
         BatchFileWriter  batchFileWriter = new BatchFileWriter(chunkedFilePath);
+
+        this.chunkDataFile = new RandomAccessFile(chunkDataFilePath,"rw");
+        this.chunkIndexFile = new RandomAccessFile(chunkIndexFilePath,"rw");
 
         chunkDataFile.seek(chunkDataFile.length());
         chunkIndexFile.seek(chunkIndexFile.length());
@@ -46,7 +46,7 @@ public class Chunker {
     public void startChunking() throws IOException {
         ChunkerEngine chunkerEngine = new ChunkerEngine(chunkSize, chunkOverlap,chunkDataFile,chunkIndexFile);
 
-        //read from the parsed data and then chunk and store them.
+        //read from the parsed data and then chunk that data.
         try (Stream<Path> fileStream = Files.list(parsedPath).filter(f -> f.toString().endsWith(".json.gz"))) {
             fileStream.forEach(parsedFile -> {
                 try {

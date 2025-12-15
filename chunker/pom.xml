@@ -25,6 +25,11 @@
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.pri1712.search-engine</groupId>
+            <artifactId>tokenizer</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <artifactId>chunker</artifactId>
