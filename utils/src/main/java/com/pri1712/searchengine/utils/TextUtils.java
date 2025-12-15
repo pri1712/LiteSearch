@@ -1,6 +1,8 @@
 package com.pri1712.searchengine.utils;
 
+import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.model.TokenizedData;
+import com.pri1712.searchengine.model.data.Chunk;
 import com.pri1712.searchengine.utils.WikiDocument;
 import org.tartarus.snowball.ext.PorterStemmer;
 
@@ -100,6 +102,26 @@ public final class TextUtils {
         }
 
         return new TokenizedData(textTokens, titleTokens, wikiDocument.getId());
+    }
+
+    public static TokenizedChunk tokenizeChunk(Chunk chunk) {
+        Matcher textMatcher = WORD_PATTERN.matcher(chunk.getChunkText());
+        PorterStemmer stemmer = new PorterStemmer();
+        List<String> textTokens = new ArrayList<>();
+
+        while (textMatcher.find()) {
+            String token = textMatcher.group();
+            if (token.length() <= 1) continue;
+            String lower = token.toLowerCase();
+            if (ENGLISH_STOP_WORDS.contains(lower)) continue;
+            stemmer.setCurrent(lower);
+            stemmer.stem();
+            String stemmed = stemmer.getCurrent();
+            LOGGER.fine(() -> "adding token to textTokens: " + stemmed);
+            textTokens.add(stemmed);
+        }
+        LOGGER.fine("text tokens: " + textTokens);
+        return new TokenizedChunk(textTokens,chunk.getChunkId().toString());
     }
 
     public static List<String> tokenizeQuery(List<String> tokens) {
