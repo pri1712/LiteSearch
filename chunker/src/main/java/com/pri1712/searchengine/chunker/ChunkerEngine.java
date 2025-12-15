@@ -6,23 +6,23 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pri1712.searchengine.utils.WikiDocument;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 public class ChunkerEngine {
     private int chunkSize;
     private int chunkOverlap;
-    private String chunkDataFile;
-    private String chunkIndexFile;
+    private RandomAccessFile chunkDataFile;
+    private RandomAccessFile chunkIndexFile;
     ObjectMapper mapper = new ObjectMapper().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
-
-    public ChunkerEngine(int chunkSize, int chunkOverlap, String chunkDataFile, String chunkIndexFile) {
+    private static final Logger LOGGER = Logger.getLogger(ChunkerEngine.class.getName());
+    public ChunkerEngine(int chunkSize, int chunkOverlap, RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile) {
         this.chunkSize = chunkSize;
         this.chunkOverlap = chunkOverlap;
         this.chunkDataFile = chunkDataFile;
@@ -56,6 +56,19 @@ public class ChunkerEngine {
             String[] chunkWords = java.util.Arrays.copyOfRange(words, i, end);
             String chunkText = String.join(" ", chunkWords);
 
+            byte[] chunkBytes = chunkText.getBytes(StandardCharsets.UTF_8);
+            long chunkBytesLength = chunkBytes.length;
+
+            try {
+                long dataFilePointer = chunkDataFile.getFilePointer();
+                chunkDataFile.write(chunkBytes);
+                chunkIndexFile.writeLong(dataFilePointer);
+                chunkIndexFile.writeInt((int) chunkBytesLength);
+                chunkIndexFile.writeInt((int) Integer.parseInt(docId));
+
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Error reading chunk data file pointer", e);
+            }
         }
 
     }
