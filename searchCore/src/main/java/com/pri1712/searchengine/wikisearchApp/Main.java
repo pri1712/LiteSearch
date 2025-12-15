@@ -38,8 +38,8 @@ public class Main {
 
     private static int CHUNK_SIZE = 512; //in tokens, 1 word = ~0.75 token
     private static int CHUNK_OVERLAP = 50;
-    private static String chunkDataFilePath = "chunked_data.data";
-    private static String chunkIndexFilePath = "chunked_index.bin";
+    private static String chunkDataFilePath = "data/chunked-data/chunked_data.data";
+    private static String chunkIndexFilePath = "data/chunked-data/chunked_index.bin";
 
     public static void main(String[] args) throws IOException {
         long startTime = getStartTime();

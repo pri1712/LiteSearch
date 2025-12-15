@@ -30,14 +30,14 @@ public class Chunker {
     public Chunker(int chunkSize, int chunkOverlap, String parsedFilePath, String chunkedFilePath, String chunkDataFilePath, String chunkIndexFilePath) throws IOException {
         this.chunkSize = chunkSize;
         this.chunkOverlap = chunkOverlap;
-
-        this.chunkDataFile = new RandomAccessFile(chunkDataFilePath,"rw");
-        this.chunkIndexFile = new RandomAccessFile(chunkIndexFilePath,"rw");
-
         this.parsedFilePath = parsedFilePath;
         parsedPath = Paths.get(parsedFilePath);
         this.chunkedFilePath = chunkedFilePath;
+
         BatchFileWriter  batchFileWriter = new BatchFileWriter(chunkedFilePath);
+
+        this.chunkDataFile = new RandomAccessFile(chunkDataFilePath,"rw");
+        this.chunkIndexFile = new RandomAccessFile(chunkIndexFilePath,"rw");
 
         chunkDataFile.seek(chunkDataFile.length());
         chunkIndexFile.seek(chunkIndexFile.length());
