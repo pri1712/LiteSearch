@@ -1,7 +1,8 @@
 package com.pri1712.searchengine.wikiquerying;
 
+import com.pri1712.searchengine.indexreader.IndexData;
 import com.pri1712.searchengine.utils.TextUtils;
-import com.pri1712.searchengine.indexreader.IndexReader;;
+import com.pri1712.searchengine.indexreader.IndexReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,7 +34,8 @@ public class QueryEngine {
         //tokenize and normalize the query
         List<String> tokens = preprocessQuery(line);
         this.indexReader = new IndexReader(invertedIndex,tokenIndexOffset);
-        indexReader.readTokenIndex(tokens);
+        List<IndexData> queryIndexData = indexReader.readTokenIndex(tokens);
+        //now we have the doc IDs and freq of the token in eaach of those,how do we do IR now?
     }
 
     public List<String> preprocessQuery(String line) throws IOException {

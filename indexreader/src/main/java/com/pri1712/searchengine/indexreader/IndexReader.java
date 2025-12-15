@@ -75,7 +75,7 @@ public class IndexReader {
         List<IndexData> indexDataList = new ArrayList<>();
         List<Long> tokenOffsets = new ArrayList<>();
         for (String token : tokens) {
-            LOGGER.info("token: " + token);
+//            LOGGER.info("token: " + token);
             Long tokenOffset = tokenOffsetMap.get(token);
             addTokenOffset(tokenOffset,tokenOffsets);
             List<Map<Integer,Integer>> decompressedPostingList = indexDecompression.readCompressedIndex(indexedFilePath,tokenOffsets);
