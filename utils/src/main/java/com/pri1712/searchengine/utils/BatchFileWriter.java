@@ -75,4 +75,8 @@ public class BatchFileWriter {
         long used = (rt.totalMemory() - rt.freeMemory()) / (1024 * 1024);
         LOGGER.fine(String.format("Heap used: %d MB", used));
     }
+
+    public void writeChunk() {
+
+    }
 }

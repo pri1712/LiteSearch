@@ -18,6 +18,7 @@
         <module>indexreader</module>
         <module>queryCore</module>
         <module>modelCore</module>
+        <module>chunker</module>
     </modules>
 
     <properties>

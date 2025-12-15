@@ -1,5 +1,6 @@
 package com.pri1712.searchengine.wikisearchApp;
 
+import com.pri1712.searchengine.chunker.Chunker;
 import com.pri1712.searchengine.indexreader.IndexData;
 import com.pri1712.searchengine.parser.Parser;
 import com.pri1712.searchengine.tokenizer.Tokenizer;
@@ -7,6 +8,7 @@ import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.indexreader.IndexReader;
 import com.pri1712.searchengine.wikiquerying.QueryEngine;
 
+import javax.swing.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,6 +26,7 @@ public class Main {
     private static final String INDEXED_FILE_PATH = "data/inverted-index/";
     private static final String TOKEN_INDEX_OFFSET_PATH = "data/inverted-index/token_index_offset.json.gz";
     private static final String DOC_STATS_PATH = "data/doc-stats/";
+    private static final String CHUNKED_FILE_PATH = "data/chunked-data/";
 
     private static final String TEST_TOKEN = "aaaaamaaj";
     static String parsedFilePath = PARSED_FILE_PATH;
@@ -31,6 +34,12 @@ public class Main {
     static String indexedFilePath = INDEXED_FILE_PATH;
     static String tokenIndexOffsetPath = TOKEN_INDEX_OFFSET_PATH;
     static String docStatsPath = DOC_STATS_PATH;
+    static String chunkedFilePath = CHUNKED_FILE_PATH;
+
+    private static int CHUNK_SIZE = 512; //in tokens, 1 word = ~0.75 token
+    private static int CHUNK_OVERLAP = 50;
+    private static String chunkDataFilePath = "chunked_data.data";
+    private static String chunkIndexFilePath = "chunked_index.bin";
 
     public static void main(String[] args) throws IOException {
         long startTime = getStartTime();
@@ -80,6 +89,13 @@ public class Main {
             Parser parser = new Parser(dataPath);
             parser.parseData();
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            Chunker chunker = new Chunker(CHUNK_SIZE, CHUNK_OVERLAP, parsedFilePath, chunkedFilePath, chunkDataFilePath, chunkIndexFilePath );
+            chunker.startChunking();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         try {
