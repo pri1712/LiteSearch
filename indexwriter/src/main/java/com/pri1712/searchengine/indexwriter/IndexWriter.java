@@ -79,7 +79,7 @@ public class IndexWriter {
     //merge all the created inverted indexes.
     public void mergeAllIndexes(String indexFilePath) throws IOException {
         Path indexedPath = Paths.get(indexFilePath);
-        Path tokenIndexOutputPath = indexedPath.resolve(String.format("token_index_offset.json.gz"));
+//        Path tokenIndexOutputPath = indexedPath.resolve(String.format("token_index_offset.json.gz"));
 
         int indexRound = 0;
         List<Path> indexFiles = Files.list(indexedPath)
@@ -109,7 +109,7 @@ public class IndexWriter {
         }
         LOGGER.info("Indexed all data.");
         //delta encoding on final inverted index.
-        compressor.deltaEncode(indexFiles.get(0),tokenIndexOutputPath);
+//        compressor.deltaEncode(indexFiles.get(0),tokenIndexOutputPath);
 
     }
 

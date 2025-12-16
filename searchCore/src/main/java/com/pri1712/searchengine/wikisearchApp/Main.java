@@ -1,6 +1,7 @@
 package com.pri1712.searchengine.wikisearchApp;
 
 import com.pri1712.searchengine.chunker.Chunker;
+import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.parser.Parser;
 import com.pri1712.searchengine.indexreader.IndexReader;
 import com.pri1712.searchengine.wikiquerying.QueryEngine;
@@ -100,14 +101,14 @@ public class Main {
 //            LOGGER.log(Level.WARNING, e.getMessage());
 //            throw new RuntimeException(e);
 //        }
-//        try {
-//            IndexWriter indexWriter = new IndexWriter(indexedFilePath);
+        try {
+            IndexWriter indexWriter = new IndexWriter(indexedFilePath);
 //            LOGGER.info("Indexing Wikipedia XML dump file: " + tokenizedFilePath);
 //            indexWriter.indexData(tokenizedFilePath);
-//            indexWriter.mergeAllIndexes(indexedFilePath);
-//        } catch (RuntimeException | IOException e) {
-//            throw new RuntimeException(e);
-//        }
+            indexWriter.mergeAllIndexes(indexedFilePath);
+        } catch (RuntimeException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void runReadPipeline(IndexReader indexReader, String indexedFilePath) {
