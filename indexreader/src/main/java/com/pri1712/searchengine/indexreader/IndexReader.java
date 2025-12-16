@@ -58,6 +58,7 @@ public class IndexReader {
             tokenOffsetMap.put(tokenOffsetData.getToken(), tokenOffsetData.getOffset());//storing token to offset in memory in a map.
         }
     }
+
     public IndexData readTokenIndex(String token) throws IOException {
         Long tokenOffset = tokenOffsetMap.get(token);
         List<Long> tokenOffsets = new ArrayList<>();
@@ -70,7 +71,7 @@ public class IndexReader {
             docIds.add(entry.getKey());
             freqs.add(entry.getValue());
         }
-        return new IndexData(docIds,freqs);
+        return new IndexData(docIds,freqs,token);
     }
 
     public List<IndexData> readTokenIndex(List<String> tokens) throws IOException {
@@ -81,13 +82,13 @@ public class IndexReader {
             Long tokenOffset = tokenOffsetMap.get(token);
             addTokenOffset(tokenOffset,tokenOffsets);
             List<Map<Integer,Integer>> decompressedPostingList = indexDecompression.readCompressedIndex(indexedFilePath,tokenOffsets);
-            LOGGER.info("decompressed posting list: " + decompressedPostingList);
+            LOGGER.fine("decompressed posting list: " + decompressedPostingList);
             LOGGER.info("Decompressed posting list size: " + decompressedPostingList.size());
             Map<Integer,Integer> postingMap = decompressedPostingList.get(0);
             for (var entry : postingMap.entrySet()) {
                 docIds.add(entry.getKey());
                 freqs.add(entry.getValue());
-                indexDataList.add(new IndexData(docIds,freqs));
+                indexDataList.add(new IndexData(docIds,freqs,token));
             }
         }
         return indexDataList;

@@ -103,8 +103,6 @@ public class Main {
 //        }
         try {
             IndexWriter indexWriter = new IndexWriter(indexedFilePath);
-//            LOGGER.info("Indexing Wikipedia XML dump file: " + tokenizedFilePath);
-//            indexWriter.indexData(tokenizedFilePath);
             indexWriter.mergeAllIndexes(indexedFilePath);
         } catch (RuntimeException | IOException e) {
             throw new RuntimeException(e);

@@ -5,9 +5,11 @@ import java.util.List;
 public class IndexData {
     private List<Integer> docIds;
     private List<Integer> freqs;
-    public IndexData(List<Integer> docIds, List<Integer> freqs) {
+    private String token;
+    public IndexData(List<Integer> docIds, List<Integer> freqs,String token) {
         this.docIds = docIds;
         this.freqs = freqs;
+        this.token = token;
     }
 
     public List<Integer> getDocIds() {
@@ -24,5 +26,13 @@ public class IndexData {
 
     public void setFreqs(List<Integer> freqs) {
         this.freqs = freqs;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
