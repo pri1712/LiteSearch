@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.model.data.Chunk;
 import com.pri1712.searchengine.utils.BatchFileWriter;
 import com.pri1712.searchengine.parser.CheckpointManager;
@@ -80,13 +81,18 @@ public class Tokenizer {
         Files.move(tmp, docStatsFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
 
-    public void tokenizeChunk(Chunk chunk) throws IOException {
+    public TokenizedChunk tokenizeChunk(Chunk chunk) throws IOException {
         //tokenize and index the chunk.
-        processChunk(chunk);
+        return processChunk(chunk);
     }
 
-    private void processChunk(Chunk chunk) throws IOException {
-        TextUtils.tokenizeChunk(chunk);
+    private TokenizedChunk processChunk(Chunk chunk) throws IOException {
+        try {
+            return TextUtils.tokenizeChunk(chunk);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Exception while processing chunk", e);
+        }
+        return null;
     }
     private void processFile(Path parsedFile) throws IOException {
         try (FileInputStream fis = new FileInputStream(parsedFile.toFile());

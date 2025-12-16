@@ -20,8 +20,8 @@ import java.util.zip.GZIPInputStream;
 public class IndexReader {
     private static final Logger LOGGER = Logger.getLogger(String.valueOf(IndexReader.class));
     private Path indexedFilePath;
-    private final Path  indexTokenOffsetFilePath;
-    private final Map<String,Long> tokenOffsetMap;
+    private Path indexTokenOffsetFilePath;
+    private Map<String,Long> tokenOffsetMap;
     ObjectMapper mapper = new ObjectMapper().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     IndexDecompression indexDecompression = new IndexDecompression();
@@ -46,6 +46,7 @@ public class IndexReader {
         }
     }
 
+    public IndexReader() {}
     private void loadTokenMapInMemory(String indexTokenOffsetFilePath) throws IOException {
         FileInputStream fis = new FileInputStream(indexTokenOffsetFilePath.toString());
         GZIPInputStream gis = new GZIPInputStream(fis);
