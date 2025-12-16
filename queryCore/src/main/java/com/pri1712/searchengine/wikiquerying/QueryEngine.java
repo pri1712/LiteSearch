@@ -21,8 +21,9 @@ public class QueryEngine {
     private IndexReader indexReader;
     private Path indexedFilePath;
     private int TOP_K;
-
-    public QueryEngine(String invertedIndex, String docStats, String tokenIndexOffset, int TOP_K) throws IOException {
+    private String chunkDataFilePath;
+    private String chunkIndexFilePath;
+    public QueryEngine(String invertedIndex, String docStats, String tokenIndexOffset, int TOP_K, String chunkDataFilePath, String chunkIndexFilePath) throws IOException {
         this.invertedIndex = invertedIndex;
         this.docStats = docStats;
         this.tokenIndexOffset = tokenIndexOffset;
@@ -32,6 +33,8 @@ public class QueryEngine {
                 .filter(p -> p.getFileName().toString().endsWith("_delta_encoded.json"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("no inverted index found"));
+        this.chunkDataFilePath = chunkDataFilePath;
+        this.chunkIndexFilePath = chunkIndexFilePath;
     }
 
     public void start(String line) throws IOException {
@@ -53,7 +56,6 @@ public class QueryEngine {
             LOGGER.log(Level.SEVERE,e.getMessage(),e);
         }
 
-        //now we have the doc IDs and freq of the token in eaach of those,how do we do IR now?
     }
 
     public List<String> preprocessQuery(String line) throws IOException {
@@ -62,6 +64,14 @@ public class QueryEngine {
     }
 
     private void getChunk(String token,List<Integer> firstChunkIDList,List<Integer> firstFreqList) throws IOException {
+        try {
+            getChunkMetadata(firstChunkIDList);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE,e.getMessage(),e);
+        }
+    }
+
+    private void getChunkMetadata(List<Integer> chunkIdList) throws IOException {
 
     }
 }
