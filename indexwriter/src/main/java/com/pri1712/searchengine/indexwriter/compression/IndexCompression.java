@@ -84,4 +84,43 @@ public class IndexCompression {
             LOGGER.log(Level.WARNING, "Could not open input file " + inputFilePath.toString(), e);
         }
     }
+
+    public void deltaEncode(Path inputFilePath) {
+        Path outputFilePath = Paths.get(inputFilePath.getParent().toString(),
+                inputFilePath.getFileName().toString().replace(".json.gz", "_delta_encoded.json")
+        );
+        long byteOffset = 0;
+
+        try (FileInputStream fis = new FileInputStream(inputFilePath.toFile())) {
+            GZIPInputStream gis = new GZIPInputStream(fis);
+            BufferedReader br = new BufferedReader(new InputStreamReader(gis,StandardCharsets.UTF_8));
+            FileOutputStream fos = new FileOutputStream(outputFilePath.toFile());
+            BufferedOutputStream bos = new BufferedOutputStream(fos);
+            String line;
+            while ((line = br.readLine()) != null){
+                Map<String, Map<Integer,Integer>> index = mapper.readValue(line, new TypeReference<>() {});
+                for (var e : index.entrySet()) {
+                    String token = e.getKey();
+                    Map<Integer,Integer> docFreqMap = e.getValue();
+                    Map<Integer, Integer> deltaMap = new LinkedHashMap<>();
+                    List<Integer> docIDs = new ArrayList<>(docFreqMap.keySet());
+                    int firstDocID = docIDs.get(0);
+                    int prevDocID = firstDocID;
+                    deltaMap.put(firstDocID, docFreqMap.get(firstDocID));
+                    for (int i = 1; i<docIDs.size(); i++) {
+                        int currentDocID = docIDs.get(i);
+                        int delta = currentDocID - prevDocID;
+                        deltaMap.put(delta, docFreqMap.get(currentDocID));
+                        prevDocID = currentDocID;
+                    }
+                    byte[] jsonBytes = mapper.writeValueAsBytes(Map.of(token,deltaMap));
+                    bos.write(jsonBytes);
+                    bos.write('\n');
+                    byteOffset += jsonBytes.length + 1L;
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Could not open input file " + inputFilePath.toString(), e);
+        }
+    }
 }

@@ -12,6 +12,7 @@ import com.pri1712.searchengine.model.TokenizedData;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -109,10 +110,29 @@ public class IndexWriter {
         }
         LOGGER.info("Indexed all data.");
         //delta encoding on final inverted index.
-//        compressor.deltaEncode(indexFiles.get(0),tokenIndexOutputPath);
-
+        compressor.deltaEncode(indexFiles.get(0));
+        try {
+            deleteOriginalIndex(indexFilePath);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to delete original index due to IO exception", e);
+        }
     }
 
+    private void deleteOriginalIndex(String indexPath) throws IOException {
+        try (DirectoryStream<Path> stream =
+                     Files.newDirectoryStream(Paths.get(indexPath), "*.json.gz")) {
+
+            for (Path gzFile : stream) {
+                Path deltaFile = Paths.get(
+                        gzFile.toString().replace(".json.gz", "_delta_encoded.json")
+                );
+
+                if (Files.exists(deltaFile)) {
+                    Files.delete(gzFile);
+                }
+            }
+        }
+    }
     private void mergeBatch(List<Path> batch, Path outputIndexPath) throws IOException {
         //actual file merging logic.
         long byteOffset = 0;
