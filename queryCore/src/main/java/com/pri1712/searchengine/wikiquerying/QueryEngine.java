@@ -3,6 +3,7 @@ package com.pri1712.searchengine.wikiquerying;
 import com.pri1712.searchengine.indexreader.IndexData;
 import com.pri1712.searchengine.utils.TextUtils;
 import com.pri1712.searchengine.indexreader.IndexReader;
+import com.pri1712.searchengine.model.ChunkMetaData;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,13 +66,16 @@ public class QueryEngine {
 
     private void getChunk(String token,List<Integer> firstChunkIDList,List<Integer> firstFreqList) throws IOException {
         try {
-            getChunkMetadata(firstChunkIDList);
+            ChunkMetaData chunkMetadata = getChunkMetadata(firstChunkIDList);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE,e.getMessage(),e);
         }
     }
 
-    private void getChunkMetadata(List<Integer> chunkIdList) throws IOException {
+    private ChunkMetaData getChunkMetadata(List<Integer> chunkIdList) throws IOException {
+        //read the chunk_index.bin file, get the length, and offset in the data file
+        for (int currentChunkID : chunkIdList) {
 
+        }
     }
 }
