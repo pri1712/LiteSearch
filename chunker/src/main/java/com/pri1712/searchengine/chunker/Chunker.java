@@ -3,6 +3,7 @@ package com.pri1712.searchengine.chunker;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pri1712.searchengine.model.ChunkConfiguration;
 import com.pri1712.searchengine.utils.BatchFileWriter;
 
 import java.io.*;
@@ -43,8 +44,7 @@ public class Chunker {
     }
 
     public void startChunking() throws IOException {
-        ChunkerEngine chunkerEngine = new ChunkerEngine(chunkSize, chunkOverlap,chunkDataFile,chunkIndexFile,indexedFilePath);
-
+        ChunkerEngine chunkerEngine = new ChunkerEngine(new ChunkConfiguration(chunkSize,chunkOverlap),chunkDataFile,chunkIndexFile,indexedFilePath);
         //read from the parsed data and then chunk that data.
         try (Stream<Path> fileStream = Files.list(parsedPath).filter(f -> f.toString().endsWith(".json.gz"))) {
             fileStream.forEach(parsedFile -> {

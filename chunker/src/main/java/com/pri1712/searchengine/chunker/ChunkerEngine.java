@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.pri1712.searchengine.indexwriter.IndexWriter;
+import com.pri1712.searchengine.model.ChunkConfiguration;
 import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.model.data.Chunk;
 import com.pri1712.searchengine.utils.WikiDocument;
@@ -24,8 +25,8 @@ public class ChunkerEngine {
 
     private int chunkSize;
     private int chunkOverlap;
-    private RandomAccessFile chunkDataFile;
-    private RandomAccessFile chunkIndexFile;
+    private final RandomAccessFile chunkDataFile;
+    private final RandomAccessFile chunkIndexFile;
     private String indexFilePath;
 
     ObjectMapper mapper = new ObjectMapper().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
@@ -35,9 +36,9 @@ public class ChunkerEngine {
     Tokenizer tokenizer = new Tokenizer();
     IndexWriter indexWriter;
 
-    public ChunkerEngine(int chunkSize, int chunkOverlap, RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile, String indexedFilePath) throws IOException {
-        this.chunkSize = chunkSize;
-        this.chunkOverlap = chunkOverlap;
+    public ChunkerEngine(ChunkConfiguration chunkConfiguration, RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile, String indexedFilePath) throws IOException {
+        this.chunkSize = chunkConfiguration.getChunkSize();
+        this.chunkOverlap = chunkConfiguration.getChunkOverlap();
         this.chunkDataFile = chunkDataFile;
         this.chunkIndexFile = chunkIndexFile;
         this.indexFilePath = indexedFilePath;

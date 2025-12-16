@@ -94,6 +94,7 @@ public class Tokenizer {
         }
         return null;
     }
+
     private void processFile(Path parsedFile) throws IOException {
         try (FileInputStream fis = new FileInputStream(parsedFile.toFile());
              GZIPInputStream gis = new GZIPInputStream(fis);
