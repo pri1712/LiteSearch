@@ -26,18 +26,22 @@ public class ChunkerEngine {
     private int chunkOverlap;
     private RandomAccessFile chunkDataFile;
     private RandomAccessFile chunkIndexFile;
+    private String indexFilePath;
+
     ObjectMapper mapper = new ObjectMapper().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     private int chunkId = 0;
 
     Tokenizer tokenizer = new Tokenizer();
-    IndexWriter indexWriter = new IndexWriter();
+    IndexWriter indexWriter;
 
-    public ChunkerEngine(int chunkSize, int chunkOverlap, RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile) throws IOException {
+    public ChunkerEngine(int chunkSize, int chunkOverlap, RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile, String indexedFilePath) throws IOException {
         this.chunkSize = chunkSize;
         this.chunkOverlap = chunkOverlap;
         this.chunkDataFile = chunkDataFile;
         this.chunkIndexFile = chunkIndexFile;
+        this.indexFilePath = indexedFilePath;
+        indexWriter = new IndexWriter(indexFilePath);
     }
 
     public void processFile(Path parsedFile) throws IOException {

@@ -1,20 +1,13 @@
 package com.pri1712.searchengine.wikisearchApp;
 
 import com.pri1712.searchengine.chunker.Chunker;
-import com.pri1712.searchengine.indexreader.IndexData;
 import com.pri1712.searchengine.parser.Parser;
-import com.pri1712.searchengine.tokenizer.Tokenizer;
-import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.indexreader.IndexReader;
 import com.pri1712.searchengine.wikiquerying.QueryEngine;
 
-import javax.swing.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,28 +86,28 @@ public class Main {
         }
 
         try {
-            Chunker chunker = new Chunker(CHUNK_SIZE, CHUNK_OVERLAP, parsedFilePath, chunkedFilePath, chunkDataFilePath, chunkIndexFilePath );
+            Chunker chunker = new Chunker(CHUNK_SIZE, CHUNK_OVERLAP, parsedFilePath, chunkedFilePath, chunkDataFilePath, chunkIndexFilePath,indexedFilePath );
             chunker.startChunking();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        try {
-            Tokenizer tokenizer = new Tokenizer(parsedFilePath,docStatsPath);
-            LOGGER.info("Tokenizing Wikipedia XML dump file: " + parsedFilePath);
-            tokenizer.tokenizeData();
-
-        } catch (RuntimeException | IOException e) {
-            LOGGER.log(Level.WARNING, e.getMessage());
-            throw new RuntimeException(e);
-        }
-        try {
-            IndexWriter indexWriter = new IndexWriter(indexedFilePath);
-            LOGGER.info("Indexing Wikipedia XML dump file: " + tokenizedFilePath);
-            indexWriter.indexData(tokenizedFilePath);
-            indexWriter.mergeAllIndexes(indexedFilePath);
-        } catch (RuntimeException | IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            Tokenizer tokenizer = new Tokenizer(parsedFilePath,docStatsPath);
+//            LOGGER.info("Tokenizing Wikipedia XML dump file: " + parsedFilePath);
+//            tokenizer.tokenizeData();
+//
+//        } catch (RuntimeException | IOException e) {
+//            LOGGER.log(Level.WARNING, e.getMessage());
+//            throw new RuntimeException(e);
+//        }
+//        try {
+//            IndexWriter indexWriter = new IndexWriter(indexedFilePath);
+//            LOGGER.info("Indexing Wikipedia XML dump file: " + tokenizedFilePath);
+//            indexWriter.indexData(tokenizedFilePath);
+//            indexWriter.mergeAllIndexes(indexedFilePath);
+//        } catch (RuntimeException | IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     private static void runReadPipeline(IndexReader indexReader, String indexedFilePath) {

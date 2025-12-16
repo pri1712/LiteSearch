@@ -12,14 +12,13 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-import java.util.zip.GZIPInputStream;
 
 public class Chunker {
     private static final Logger LOGGER = Logger.getLogger(Chunker.class.getName());
     private int chunkSize;
     private int chunkOverlap;
-    private String parsedFilePath;
     private String chunkedFilePath;
+    private String indexedFilePath;
     ObjectMapper mapper = new ObjectMapper().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     Path parsedPath;
@@ -27,12 +26,12 @@ public class Chunker {
     private RandomAccessFile chunkDataFile;
     private RandomAccessFile chunkIndexFile;
 
-    public Chunker(int chunkSize, int chunkOverlap, String parsedFilePath, String chunkedFilePath, String chunkDataFilePath, String chunkIndexFilePath) throws IOException {
+    public Chunker(int chunkSize, int chunkOverlap, String parsedFilePath, String chunkedFilePath, String chunkDataFilePath, String chunkIndexFilePath, String indexedFilePath) throws IOException {
         this.chunkSize = chunkSize;
         this.chunkOverlap = chunkOverlap;
-        this.parsedFilePath = parsedFilePath;
         parsedPath = Paths.get(parsedFilePath);
         this.chunkedFilePath = chunkedFilePath;
+        this.indexedFilePath = indexedFilePath;
 
         BatchFileWriter  batchFileWriter = new BatchFileWriter(chunkedFilePath);
 
@@ -44,7 +43,7 @@ public class Chunker {
     }
 
     public void startChunking() throws IOException {
-        ChunkerEngine chunkerEngine = new ChunkerEngine(chunkSize, chunkOverlap,chunkDataFile,chunkIndexFile);
+        ChunkerEngine chunkerEngine = new ChunkerEngine(chunkSize, chunkOverlap,chunkDataFile,chunkIndexFile,indexedFilePath);
 
         //read from the parsed data and then chunk that data.
         try (Stream<Path> fileStream = Files.list(parsedPath).filter(f -> f.toString().endsWith(".json.gz"))) {

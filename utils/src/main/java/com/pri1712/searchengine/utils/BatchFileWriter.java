@@ -76,7 +76,26 @@ public class BatchFileWriter {
         LOGGER.fine(String.format("Heap used: %d MB", used));
     }
 
-    public void writeChunk() {
-
+    public void writeChunk(Map<String, Map<Integer,Integer>> invertedIndex, int batchCount) throws IOException {
+        String outputFile = String.format("%sindex_%05d.json.gz", outputDir, batchCount);
+        try (
+                FileOutputStream fos = new FileOutputStream(outputFile);
+                GZIPOutputStream gos = new GZIPOutputStream(fos);
+                OutputStreamWriter osw = new OutputStreamWriter(gos, StandardCharsets.UTF_8);
+                BufferedWriter bw = new BufferedWriter(osw)
+        ) {
+            for (var entry : invertedIndex.entrySet()) {
+                mapper.writeValue(bw, Map.of(entry.getKey(), entry.getValue()));
+                bw.write("\n");
+            }
+            bw.flush();
+            gos.finish();
+    } catch (IOException e) {
+        LOGGER.log(Level.SEVERE, "Error while writing chunk",e);
+        LOGGER.fine(String.format("Failed to write chunk %s", outputFile));
+        }
+        Runtime rt = Runtime.getRuntime();
+        long used = (rt.totalMemory() - rt.freeMemory()) / (1024 * 1024);
+        LOGGER.fine(String.format("Heap used: %d MB", used));
     }
 }

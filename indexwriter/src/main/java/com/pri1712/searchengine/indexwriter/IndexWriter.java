@@ -75,6 +75,7 @@ public class IndexWriter {
             LOGGER.log(Level.SEVERE, "Error indexing chunks", e);
         }
     }
+
     //merge all the created inverted indexes.
     public void mergeAllIndexes(String indexFilePath) throws IOException {
         Path indexedPath = Paths.get(indexFilePath);
@@ -207,7 +208,7 @@ public class IndexWriter {
                 addDocument(document);
                 long preUsedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024); //used mem in MB
                 if (shouldFlush()) {
-                    LOGGER.info("Flushing to disk");
+                    LOGGER.fine("Flushing to disk");
                     batchFileWriter.writeIndex(invertedIndex,indexFileCounter);
                     invertedIndex.clear();
                     indexFileCounter++;
@@ -225,7 +226,14 @@ public class IndexWriter {
 
     private void addToIndex(TokenizedChunk tokenizedChunk) throws Exception {
         try {
+            LOGGER.fine("tokenize chunk text: " + tokenizedChunk.getTokenizedText());
             addChunk(tokenizedChunk);
+            if (shouldFlush()) {
+                LOGGER.fine("Flushing to disk");
+                batchFileWriter.writeChunk(invertedIndex,indexFileCounter);
+                invertedIndex.clear();
+                indexFileCounter++;
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE,"Failed to add tokenized chunk to disk",e);
         }
@@ -246,12 +254,12 @@ public class IndexWriter {
                     .computeIfAbsent(token, k -> new HashMap<>())
                     .merge(Integer.parseInt(id), 1, Integer::sum);
         }
-
     }
 
     private void addChunk(TokenizedChunk tokenizedChunk) {
         List<String> chunkText = tokenizedChunk.getTokenizedText();
         String chunkId = tokenizedChunk.getChunkId();
+        //in chunks the title and text is all treated as a chunk itself, there is no distinction while tokenizing it.
         for (String token : chunkText) {
             invertedIndex
                     .computeIfAbsent(token, k -> new HashMap<>())
