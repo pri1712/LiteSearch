@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.pri1712.searchengine.indexwriter.IndexWriter;
+import com.pri1712.searchengine.model.BM25Stats;
 import com.pri1712.searchengine.model.ChunkConfiguration;
 import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.model.data.Chunk;
@@ -28,21 +29,30 @@ public class ChunkerEngine {
     private final RandomAccessFile chunkDataFile;
     private final RandomAccessFile chunkIndexFile;
     private String indexFilePath;
+    private String docStatsFilePath;
+    private final BM25Stats stats;
 
     ObjectMapper mapper = new ObjectMapper().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     private int chunkId = 0;
 
+    private long totalChunks = 0;
+    private long totalTokens = 0;
+    private long averageChunkSize = 0;
+
     Tokenizer tokenizer = new Tokenizer();
     IndexWriter indexWriter;
 
-    public ChunkerEngine(ChunkConfiguration chunkConfiguration, RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile, String indexedFilePath) throws IOException {
+    public ChunkerEngine(ChunkConfiguration chunkConfiguration, RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile, String indexedFilePath, String docStatsPath) throws IOException {
         this.chunkSize = chunkConfiguration.getChunkSize();
         this.chunkOverlap = chunkConfiguration.getChunkOverlap();
         this.chunkDataFile = chunkDataFile;
         this.chunkIndexFile = chunkIndexFile;
         this.indexFilePath = indexedFilePath;
+        this.docStatsFilePath = docStatsPath;
         indexWriter = new IndexWriter(indexFilePath);
+
+        stats = new BM25Stats();
     }
 
     public void processFile(Path parsedFile) throws IOException {
@@ -67,7 +77,7 @@ public class ChunkerEngine {
         int slidingWindowSize = chunkSize - chunkOverlap;
 
         for (int i = 0; i < words.length; i+=slidingWindowSize) {
-            int end = Math.min(words.length, i + slidingWindowSize);
+            int end = Math.min(words.length, i + chunkSize);
             String[] chunkWords = java.util.Arrays.copyOfRange(words, i, end);
             String chunkText = String.join(" ", chunkWords);
             byte[] chunkBytes = chunkText.getBytes(StandardCharsets.UTF_8);
@@ -89,6 +99,8 @@ public class ChunkerEngine {
                 LOGGER.log(Level.WARNING, "Error reading chunk data file pointer", e);
             }
             chunkId++;
+            totalChunks++;
+            totalTokens += chunkWords.length;
         }
         LOGGER.log(Level.FINE, "Chunk ID {0}", chunkId);
     }

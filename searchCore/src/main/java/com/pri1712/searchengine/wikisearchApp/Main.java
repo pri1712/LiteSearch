@@ -19,7 +19,7 @@ public class Main {
     private static final String TOKENIZED_FILE_PATH = "data/tokenized-data/";
     private static final String INDEXED_FILE_PATH = "data/inverted-index/";
     private static final String TOKEN_INDEX_OFFSET_PATH = "data/inverted-index/token_index_offset.json.gz";
-    private static final String DOC_STATS_PATH = "data/doc-stats/";
+    private static final String DOC_STATS_PATH = "data/doc-stats/stats.json";
     private static final String CHUNKED_FILE_PATH = "data/chunked-data/";
 
     private static final int TOP_K = 1;
@@ -89,7 +89,7 @@ public class Main {
         }
 
         try {
-            Chunker chunker = new Chunker(CHUNK_SIZE, CHUNK_OVERLAP, parsedFilePath, chunkedFilePath, chunkDataFilePath, chunkIndexFilePath,indexedFilePath );
+            Chunker chunker = new Chunker(CHUNK_SIZE, CHUNK_OVERLAP, parsedFilePath, chunkedFilePath, chunkDataFilePath, chunkIndexFilePath,indexedFilePath, docStatsPath );
             chunker.startChunking();
         } catch (IOException e) {
             throw new RuntimeException(e);

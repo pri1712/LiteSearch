@@ -20,6 +20,8 @@ public class Chunker {
     private int chunkOverlap;
     private String chunkedFilePath;
     private String indexedFilePath;
+    private String docStatsPath;
+
     ObjectMapper mapper = new ObjectMapper().configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
             .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
     Path parsedPath;
@@ -27,12 +29,13 @@ public class Chunker {
     private RandomAccessFile chunkDataFile;
     private RandomAccessFile chunkIndexFile;
 
-    public Chunker(int chunkSize, int chunkOverlap, String parsedFilePath, String chunkedFilePath, String chunkDataFilePath, String chunkIndexFilePath, String indexedFilePath) throws IOException {
+    public Chunker(int chunkSize, int chunkOverlap, String parsedFilePath, String chunkedFilePath, String chunkDataFilePath, String chunkIndexFilePath, String indexedFilePath, String docStatsPath) throws IOException {
         this.chunkSize = chunkSize;
         this.chunkOverlap = chunkOverlap;
         parsedPath = Paths.get(parsedFilePath);
         this.chunkedFilePath = chunkedFilePath;
         this.indexedFilePath = indexedFilePath;
+        this.docStatsPath = docStatsPath;
 
         BatchFileWriter  batchFileWriter = new BatchFileWriter(chunkedFilePath);
 
@@ -44,7 +47,7 @@ public class Chunker {
     }
 
     public void startChunking() throws IOException {
-        ChunkerEngine chunkerEngine = new ChunkerEngine(new ChunkConfiguration(chunkSize,chunkOverlap),chunkDataFile,chunkIndexFile,indexedFilePath);
+        ChunkerEngine chunkerEngine = new ChunkerEngine(new ChunkConfiguration(chunkSize,chunkOverlap),chunkDataFile,chunkIndexFile,indexedFilePath,docStatsPath);
         //read from the parsed data and then chunk that data.
         try (Stream<Path> fileStream = Files.list(parsedPath).filter(f -> f.toString().endsWith(".json.gz"))) {
             fileStream.forEach(parsedFile -> {
