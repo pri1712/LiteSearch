@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pri1712.searchengine.indexreader.IndexData;
 import com.pri1712.searchengine.model.BM25Stats;
 import com.pri1712.searchengine.model.ScoredChunk;
+import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.utils.TextUtils;
 import com.pri1712.searchengine.indexreader.IndexReader;
 import com.pri1712.searchengine.model.ChunkMetaData;
@@ -33,13 +34,16 @@ public class QueryEngine {
     private String tokenIndexOffset;
     private IndexReader indexReader;
     private Path indexedFilePath;
-    private final int TOP_K;
     private final int RECORD_SIZE;
     private final RandomAccessFile chunkIndexFile;
     private final RandomAccessFile chunkDataFile;
     private BM25Stats stats;
 
-    public QueryEngine(String invertedIndex, String docStats, String tokenIndexOffset, int TOP_K, String chunkDataFilePath, String chunkIndexFilePath, int RECORD_SIZE) throws IOException {
+    private final int TOP_K;
+    private final double TERM_FREQUENCY_SATURATION;
+    private final double DOCUMENT_LENGTH_NORMALIZATION;
+
+    public QueryEngine(String invertedIndex, String docStats, String tokenIndexOffset, int TOP_K, String chunkDataFilePath, String chunkIndexFilePath, int RECORD_SIZE, double TERM_FREQUENCY_SATURATION, double DOCUMENT_LENGTH_NORMALIZATION) throws IOException {
         this.invertedIndex = invertedIndex;
         this.docStats = docStats;
         this.tokenIndexOffset = tokenIndexOffset;
@@ -52,6 +56,8 @@ public class QueryEngine {
         this.RECORD_SIZE = RECORD_SIZE;
         this.chunkIndexFile = new RandomAccessFile(chunkIndexFilePath, "r");
         this.chunkDataFile = new RandomAccessFile(chunkDataFilePath, "r");
+        this.TERM_FREQUENCY_SATURATION = TERM_FREQUENCY_SATURATION;
+        this.DOCUMENT_LENGTH_NORMALIZATION = DOCUMENT_LENGTH_NORMALIZATION;
     }
 
     public void start(String line) throws IOException {
@@ -134,25 +140,40 @@ public class QueryEngine {
         return filteredChunkMetaData;
     }
 
+    /***
+     *
+     * @param chunkMetaData
+     * @param freqList
+     * @param chunkIDList
+     * @return returns a list of scoredChunk objects, these contain the score for the chunk too with respect to the token being queried.
+     */
     private List<ScoredChunk> rankBM25(List<ChunkMetaData> chunkMetaData,List<Integer> freqList,List<Integer> chunkIDList) {
         List<ScoredChunk> scoredChunkList = new ArrayList<>();
         for (int i =0;i<chunkMetaData.size();i++) {
             //score each of the entries in the chunkmetadata list.
             int tokenFrequency = freqList.get(i);
-            long totalTokenCount = stats.getTotalTokens();
+//            long totalTokenCount = stats.getTotalTokens();
             long totalChunkCount = stats.getTotalChunks();
             int postListSize = chunkIDList.size();
             long averageChunkSize = stats.getAverageChunkSize();
+            int currentChunkID = chunkIDList.get(i);
             ChunkMetaData data = chunkMetaData.get(i);
-            ScoredChunk scoredChunk = scoreChunks(data,tokenFrequency, totalTokenCount, totalChunkCount, postListSize, averageChunkSize);
+            ScoredChunk scoredChunk = scoreChunks(data,tokenFrequency, totalChunkCount, postListSize, averageChunkSize,currentChunkID);
             scoredChunkList.add(scoredChunk);
         }
         return scoredChunkList;
     }
 
 
-    private ScoredChunk scoreChunks(ChunkMetaData data,int tokenFrequency, long totalTokenCount, long totalChunkCount, int postingListSize, long averageChunkSize) {
+    private ScoredChunk scoreChunks(ChunkMetaData data,int tokenFrequency, long totalChunkCount, int postingListSize, long averageChunkSize, int currentChunkID) {
+        double idf = Math.log(1.0 + (totalChunkCount - postingListSize + 0.5) / (postingListSize + 0.5));
+        int chunkLength = data.getTokenCount();
+        double num = tokenFrequency * (TERM_FREQUENCY_SATURATION + 1);
+        double denom = tokenFrequency + TERM_FREQUENCY_SATURATION * (1 - DOCUMENT_LENGTH_NORMALIZATION + DOCUMENT_LENGTH_NORMALIZATION * ((double) chunkLength / averageChunkSize));
 
+        double score = idf * (num / denom);
+        ScoredChunk scoredChunk = new ScoredChunk(score,currentChunkID,data);
+        return scoredChunk;
     }
     private List<String> getChunkData(List<ChunkMetaData> chunkMetaData) throws IOException {
         List<String> chunks = new ArrayList<>();

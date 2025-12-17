@@ -138,7 +138,7 @@ public class Main {
                     continue;
                 }
                 try {
-                    QueryEngine queryEngine = new QueryEngine(indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE);
+                    QueryEngine queryEngine = new QueryEngine(indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE, TERM_FREQUENCY_SATURATION, DOCUMENT_LENGTH_NORMALIZATION);
                     queryEngine.start(line);
 
                 } catch (IOException e) {
