@@ -70,7 +70,7 @@ public class IndexDecompression {
     }
 
     private static Map<Integer,Integer> parsePostingsLine(String line) throws JsonProcessingException {
-        LOGGER.info("Parsing postings line: " + line);
+        LOGGER.fine("Parsing postings line: " + line);
         Map<String,Map<String,Integer>> tokenIndexList = mapper.readValue(line, new TypeReference<>() {
         });
         if (tokenIndexList.isEmpty()){

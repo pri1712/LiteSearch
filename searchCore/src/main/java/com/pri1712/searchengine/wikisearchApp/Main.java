@@ -139,7 +139,8 @@ public class Main {
                 }
                 try {
                     QueryEngine queryEngine = new QueryEngine(indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE, TERM_FREQUENCY_SATURATION, DOCUMENT_LENGTH_NORMALIZATION);
-                    queryEngine.start(line);
+                    List<String> relevantChunks = queryEngine.start(line);
+                    LOGGER.info("relevant chunks: " + relevantChunks);
 
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, "Query failed", e);
