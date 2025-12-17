@@ -34,6 +34,9 @@ public class Main {
 
     private static int CHUNK_SIZE = 512; //in tokens, 1 word = ~0.75 token
     private static int CHUNK_OVERLAP = 55;
+    private static double TERM_FREQUENCY_SATURATION = 1.5;
+    private static double DOCUMENT_LENGTH_NORMALIZATION = 0.75;
+
     private static String chunkDataFilePath = "data/chunked-data/chunked_data.data";
     private static String chunkIndexFilePath = "data/chunked-data/chunked_index.bin";
 
@@ -135,7 +138,7 @@ public class Main {
                     continue;
                 }
                 try {
-                    QueryEngine queryEngine = new QueryEngine(indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE);
+                    QueryEngine queryEngine = new QueryEngine(indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE, TERM_FREQUENCY_SATURATION, DOCUMENT_LENGTH_NORMALIZATION);
                     queryEngine.start(line);
 
                 } catch (IOException e) {
