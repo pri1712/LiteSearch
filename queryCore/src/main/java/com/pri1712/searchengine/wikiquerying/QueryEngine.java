@@ -8,6 +8,7 @@ import com.pri1712.searchengine.indexreader.IndexReader;
 import com.pri1712.searchengine.model.BM25Stats;
 import com.pri1712.searchengine.model.ChunkMetaData;
 import com.pri1712.searchengine.model.ScoredChunk;
+import com.pri1712.searchengine.model.params.RankingParams;
 import com.pri1712.searchengine.utils.TextUtils;
 
 import java.io.*;
@@ -41,15 +42,14 @@ public class QueryEngine {
     private BM25Stats stats;
 
     public QueryEngine(IndexReader indexReader,String invertedIndex, String docStats, String tokenIndexOffset, int TOP_K,
-                       String chunkDataFilePath, String chunkIndexFilePath, int RECORD_SIZE,
-                       double k1, double b) throws IOException {
+                       String chunkDataFilePath, String chunkIndexFilePath, int RECORD_SIZE) throws IOException {
         this.invertedIndex = invertedIndex;
         this.docStats = docStats;
         this.tokenIndexOffset = tokenIndexOffset;
         this.TOP_K = TOP_K;
         this.RECORD_SIZE = RECORD_SIZE;
-        this.TERM_FREQUENCY_SATURATION = k1;
-        this.DOCUMENT_LENGTH_NORMALIZATION = b;
+        this.TERM_FREQUENCY_SATURATION = RankingParams.getTERM_FREQUENCY_SATURATION();
+        this.DOCUMENT_LENGTH_NORMALIZATION = RankingParams.getDOCUMENT_LENGTH_NORMALIZATION();
         this.indexReader = indexReader;
         this.chunkIndexFile = new RandomAccessFile(chunkIndexFilePath, "r");
         this.chunkDataFile = new RandomAccessFile(chunkDataFilePath, "r");

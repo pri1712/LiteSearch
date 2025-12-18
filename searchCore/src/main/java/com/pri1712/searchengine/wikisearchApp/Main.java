@@ -3,6 +3,7 @@ package com.pri1712.searchengine.wikisearchApp;
 import com.pri1712.searchengine.chunker.Chunker;
 import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.model.params.ChunkParams;
+import com.pri1712.searchengine.model.params.QueryParams;
 import com.pri1712.searchengine.model.params.RankingParams;
 import com.pri1712.searchengine.parser.Parser;
 import com.pri1712.searchengine.indexreader.IndexReader;
@@ -142,7 +143,7 @@ public class Main {
                     continue;
                 }
                 try {
-                    QueryEngine queryEngine = new QueryEngine(indexReader,indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE, TERM_FREQUENCY_SATURATION, DOCUMENT_LENGTH_NORMALIZATION);
+                    QueryEngine queryEngine = new QueryEngine(indexReader,indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE);
                     List<String> relevantChunks = queryEngine.start(line);
                     LOGGER.info("relevant chunks: " + relevantChunks);
 
@@ -167,7 +168,7 @@ public class Main {
     private static void initParams() {
         new ChunkParams(CHUNK_SIZE, CHUNK_OVERLAP);
         new RankingParams(TERM_FREQUENCY_SATURATION,DOCUMENT_LENGTH_NORMALIZATION);
-        new QueryParams()
+        new QueryParams(TOP_K,RECORD_SIZE);
     }
     private static long getStartTime() {
         return System.nanoTime();
