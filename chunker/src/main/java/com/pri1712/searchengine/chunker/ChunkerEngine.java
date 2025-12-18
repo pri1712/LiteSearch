@@ -78,7 +78,10 @@ public class ChunkerEngine {
 
     private void chunkText(String text, String docId) {
         if (text == null || text.isBlank()) return;
-
+        if (!validateText(text)) {
+            LOGGER.log(Level.INFO, "Invalid text {0}", text);
+            return;
+        }
         String[] words = text.split("\\s+");
         int slidingWindowSize = chunkSize - chunkOverlap;
 
@@ -112,6 +115,11 @@ public class ChunkerEngine {
             if (end == words.length) break;
         }
         LOGGER.log(Level.FINE, "Chunk ID {0}", chunkId);
+    }
+
+    private boolean validateText(String text) {
+        if (text == null || text.isBlank()) return false;
+        if (text.length() <= MIN_)
     }
 
     public void finish() throws IOException {
