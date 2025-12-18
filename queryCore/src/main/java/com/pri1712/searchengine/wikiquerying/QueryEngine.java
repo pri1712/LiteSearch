@@ -128,6 +128,7 @@ public class QueryEngine {
     private Map<Integer, ChunkMetaData> fetchMetadataMap(Set<Integer> chunkIds) throws IOException {
         Map<Integer, ChunkMetaData> map = new HashMap<>();
 
+        LOGGER.info("RECORD SIZE: " + RECORD_SIZE);
         for (int chunkId : chunkIds) {
             long positionInIndex = (long) chunkId * RECORD_SIZE;
 
@@ -141,7 +142,10 @@ public class QueryEngine {
             int dataLength = chunkIndexFile.readInt();
             int docId = chunkIndexFile.readInt();
             int tokenCount = chunkIndexFile.readInt();
-
+            LOGGER.info("CHUNK_ID: " + chunkId +
+                    " | DATA FILE OFFSET: " + dataOffset +
+                    " | CHUNK LENGTH BYTES: " + dataLength +
+                    " | TOKENS: " + tokenCount);
             map.put(chunkId, new ChunkMetaData(dataOffset, dataLength, docId, tokenCount));
         }
         return map;

@@ -36,12 +36,13 @@ public class IndexDecompression {
             }
             indexRAF.seek(offset);
             String decodedLine = decodeUTF8(indexRAF);
-            LOGGER.info(decodedLine);
+            LOGGER.fine(decodedLine);
 
             if (decodedLine==null || decodedLine.isEmpty()) {
                 indexList.add(Map.of());
             }
             Map<Integer,Integer> decodedIndexLine = parsePostingsLine(decodedLine);
+            LOGGER.info(decodedIndexLine.toString());
             indexList.add(decodedIndexLine);
         }
         return indexList;
