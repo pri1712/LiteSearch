@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     private static final String PARSED_FILE_PATH = "data/parsed-data/";
-    private static final String TOKENIZED_FILE_PATH = "data/tokenized-data/";
+
     private static final String INDEXED_FILE_PATH = "data/inverted-index/";
     private static final String TOKEN_INDEX_OFFSET_PATH = "data/inverted-index/token_index_offset.json.gz";
     private static final String DOC_STATS_PATH = "data/doc-stats/stats.json";
@@ -24,9 +24,9 @@ public class Main {
 
     private static final int TOP_K = 20;
     private static final int RECORD_SIZE = 20;
-    private static final String TEST_TOKEN = "aaaaamaaj";
+
     static String parsedFilePath = PARSED_FILE_PATH;
-    static String tokenizedFilePath = TOKENIZED_FILE_PATH;
+
     static String indexedFilePath = INDEXED_FILE_PATH;
     static String tokenIndexOffsetPath = TOKEN_INDEX_OFFSET_PATH;
     static String docStatsPath = DOC_STATS_PATH;
@@ -138,7 +138,7 @@ public class Main {
                     continue;
                 }
                 try {
-                    QueryEngine queryEngine = new QueryEngine(indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE, TERM_FREQUENCY_SATURATION, DOCUMENT_LENGTH_NORMALIZATION);
+                    QueryEngine queryEngine = new QueryEngine(indexReader,indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE, TERM_FREQUENCY_SATURATION, DOCUMENT_LENGTH_NORMALIZATION);
                     List<String> relevantChunks = queryEngine.start(line);
                     LOGGER.info("relevant chunks: " + relevantChunks);
 

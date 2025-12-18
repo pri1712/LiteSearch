@@ -41,7 +41,7 @@ public class QueryEngine {
     private IndexReader indexReader;
     private BM25Stats stats;
 
-    public QueryEngine(String invertedIndex, String docStats, String tokenIndexOffset, int TOP_K,
+    public QueryEngine(IndexReader indexReader,String invertedIndex, String docStats, String tokenIndexOffset, int TOP_K,
                        String chunkDataFilePath, String chunkIndexFilePath, int RECORD_SIZE,
                        double k1, double b) throws IOException {
         this.invertedIndex = invertedIndex;
@@ -51,7 +51,7 @@ public class QueryEngine {
         this.RECORD_SIZE = RECORD_SIZE;
         this.TERM_FREQUENCY_SATURATION = k1;
         this.DOCUMENT_LENGTH_NORMALIZATION = b;
-
+        this.indexReader = indexReader;
         this.chunkIndexFile = new RandomAccessFile(chunkIndexFilePath, "r");
         this.chunkDataFile = new RandomAccessFile(chunkDataFilePath, "r");
 
@@ -75,7 +75,6 @@ public class QueryEngine {
             List<String> tokens = preprocessQuery(query);
             if (tokens.isEmpty()) return Collections.emptyList();
 
-            this.indexReader = new IndexReader(invertedIndex, tokenIndexOffset);
             List<IndexData> queryIndexData = indexReader.readTokenIndex(tokens);
 
             if (queryIndexData.isEmpty()) {

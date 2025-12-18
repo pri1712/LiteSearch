@@ -74,23 +74,34 @@ public class IndexReader {
         return new IndexData(docIds,freqs,token);
     }
 
+    //reads the token offsets and the tokens, and returns a list of {freq,chunkID,token} objects for each token.
     public List<IndexData> readTokenIndex(List<String> tokens) throws IOException {
         List<IndexData> indexDataList = new ArrayList<>();
-        List<Long> tokenOffsets = new ArrayList<>();
+        List<String> validTokens = new ArrayList<>();
+        List<Long> validOffsets = new ArrayList<>();
+
         for (String token : tokens) {
-//            LOGGER.info("token: " + token);
-            Long tokenOffset = tokenOffsetMap.get(token);
-            addTokenOffset(tokenOffset,tokenOffsets);
-            List<Map<Integer,Integer>> decompressedPostingList = indexDecompression.readCompressedIndex(indexedFilePath,tokenOffsets);
-            LOGGER.fine("decompressed posting list: " + decompressedPostingList);
-            LOGGER.info("Decompressed posting list size: " + decompressedPostingList.size());
-            Map<Integer,Integer> postingMap = decompressedPostingList.get(0);
-            for (var entry : postingMap.entrySet()) {
-                docIds.add(entry.getKey());
-                freqs.add(entry.getValue());
-                indexDataList.add(new IndexData(docIds,freqs,token));
+            Long offset = tokenOffsetMap.get(token);
+            if (offset != null && offset >= 0) {
+                validTokens.add(token);
+                validOffsets.add(offset);
             }
         }
+
+        if (validOffsets.isEmpty()) {
+            return indexDataList;
+        }
+
+        List<Map<Integer, Integer>> allPostings = indexDecompression.readCompressedIndex(indexedFilePath, validOffsets);
+
+        for (int i = 0; i < validTokens.size(); i++) {
+            String token = validTokens.get(i);
+            Map<Integer, Integer> postingsMap = allPostings.get(i);
+            List<Integer> chunkIds = new ArrayList<>(postingsMap.keySet());
+            List<Integer> freqs = new ArrayList<>(postingsMap.values());
+            indexDataList.add(new IndexData(chunkIds, freqs, token));
+        }
+
         return indexDataList;
     }
     private void addTokenOffset(Long offset,List<Long> tokenOffsets) {
