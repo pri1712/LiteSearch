@@ -53,11 +53,11 @@ public class Chunker {
             fileStream.forEach(parsedFile -> {
                 try {
                     chunkerEngine.processFile(parsedFile);
-                    chunkerEngine.finish();
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "Error processing file " + parsedFile.toString(), e);
                 }
             });
+            chunkerEngine.finish();
         }
     }
 
