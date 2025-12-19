@@ -105,6 +105,7 @@ public class ChunkerEngine {
                 long dataFilePointer = chunkDataFile.getFilePointer();
                 chunkDataFile.write(chunkBytes);
 
+                chunkIndexFile.writeInt(chunkId);
                 chunkIndexFile.writeLong(dataFilePointer);
                 chunkIndexFile.writeInt((int) chunkBytesLength);
                 chunkIndexFile.writeInt((int) Integer.parseInt(docId));

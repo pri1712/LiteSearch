@@ -138,14 +138,20 @@ public class QueryEngine {
             }
 
             chunkIndexFile.seek(positionInIndex);
+            int trueChunkId = chunkIndexFile.readInt();
             long dataOffset = chunkIndexFile.readLong();
             int dataLength = chunkIndexFile.readInt();
             int docId = chunkIndexFile.readInt();
             int tokenCount = chunkIndexFile.readInt();
-            LOGGER.info("CHUNK_ID: " + chunkId +
+            LOGGER.fine("CHUNK_ID: " + chunkId +
                     " | DATA FILE OFFSET: " + dataOffset +
                     " | CHUNK LENGTH BYTES: " + dataLength +
                     " | TOKENS: " + tokenCount);
+            LOGGER.info("expected Chunk ID: " + chunkId);
+            LOGGER.info("actual Chunk ID: " + trueChunkId);
+            if (trueChunkId != chunkId) {
+                LOGGER.severe("Chunk ID being read does not match the chunk ID expected ");
+            }
             map.put(chunkId, new ChunkMetaData(dataOffset, dataLength, docId, tokenCount));
         }
         return map;
