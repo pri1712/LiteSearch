@@ -241,8 +241,7 @@ public class QueryEngine {
     }
 
     private List<String> preprocessQuery(String line) {
-        List<String> tokens = Arrays.asList(line.split("\\s+"));
-        return TextUtils.tokenizeQuery(tokens);
+        return TextUtils.tokenizeQuery(line);
     }
 
     public void close() throws IOException {
