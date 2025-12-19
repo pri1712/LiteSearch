@@ -72,6 +72,7 @@ public class QueryEngine {
                 initParams();
             }
             List<String> tokens = preprocessQuery(query);
+            LOGGER.info("tokenized query: " + tokens);
             if (tokens.isEmpty()) return Collections.emptyList();
 
             List<IndexData> queryIndexData = indexReader.readTokenIndex(tokens);
@@ -87,10 +88,13 @@ public class QueryEngine {
             }
 
             Map<Integer, ChunkMetaData> metadataMap = fetchMetadataMap(uniqueChunkIds);
-
+            //number of tokens per chunkID, to reward those with higher number of matches.
+            Map<Integer, Integer> matchedTerms = new HashMap<>();
             Map<Integer, Double> aggregatedScores = new HashMap<>();
 
             for (IndexData indexData : queryIndexData) {
+                //done per token.
+                LOGGER.fine("chunk ID size: " + indexData.getIds().size());
                 List<Integer> chunkIds = indexData.getIds();
                 List<Integer> freqs = indexData.getFreqs();
 
@@ -102,15 +106,29 @@ public class QueryEngine {
                     if (meta == null) continue;
 
                     double score = calculateBM25SingleTerm(meta, tf, chunkIds.size());
-
                     aggregatedScores.merge(chunkId, score, Double::sum);
+                    matchedTerms.merge(chunkId, 1, Integer::sum);
                 }
             }
             List<ScoredChunk> allScoredChunks = new ArrayList<>();
+
+            int querySize = tokens.size();
+            double avgChunkSize = stats.getAverageChunkSize();
+
             for (Map.Entry<Integer, Double> entry : aggregatedScores.entrySet()) {
-                int id = entry.getKey();
-                ChunkMetaData meta = metadataMap.get(id);
-                allScoredChunks.add(new ScoredChunk(entry.getValue(), id, meta));
+                int chunkId = entry.getKey();
+                double baseScore = entry.getValue();
+                ChunkMetaData meta = metadataMap.get(chunkId);
+                if (meta == null) continue;
+                int matched = matchedTerms.getOrDefault(chunkId, 0);
+                double coverage = (double) matched / querySize; // [0,1]
+                double coverageBoost = 0.5 + coverage; // range: [0.5, 1.5]
+                int chunkLength = meta.getTokenCount();
+                double lengthPenalty = Math.min(1.0, avgChunkSize / chunkLength);
+
+                double finalScore = baseScore * coverageBoost * lengthPenalty;
+
+                allScoredChunks.add(new ScoredChunk(finalScore, chunkId, meta));
             }
             List<ChunkMetaData> topKMetadata = filterTOPK(allScoredChunks);
 
@@ -147,10 +165,11 @@ public class QueryEngine {
                     " | DATA FILE OFFSET: " + dataOffset +
                     " | CHUNK LENGTH BYTES: " + dataLength +
                     " | TOKENS: " + tokenCount);
-            LOGGER.info("expected Chunk ID: " + chunkId);
-            LOGGER.info("actual Chunk ID: " + trueChunkId);
+            LOGGER.finest("expected Chunk ID: " + chunkId);
+            LOGGER.finest("actual Chunk ID: " + trueChunkId);
             if (trueChunkId != chunkId) {
                 LOGGER.severe("Chunk ID being read does not match the chunk ID expected ");
+                throw new IllegalStateException("Chunk ID being read does not match the chunk ID expected ");
             }
             map.put(chunkId, new ChunkMetaData(dataOffset, dataLength, docId, tokenCount));
         }
@@ -167,7 +186,7 @@ public class QueryEngine {
         double idf = Math.log(1.0 + (totalDocs - docFreq + 0.5) / (docFreq + 0.5));
         double num = tf * (TERM_FREQUENCY_SATURATION + 1);
         double denom = tf + TERM_FREQUENCY_SATURATION * (1 - DOCUMENT_LENGTH_NORMALIZATION +
-                DOCUMENT_LENGTH_NORMALIZATION * (docLength / avgdl));
+                DOCUMENT_LENGTH_NORMALIZATION * ((double) docLength / avgdl));
 
         return idf * (num / denom);
     }

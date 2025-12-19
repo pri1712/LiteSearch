@@ -25,7 +25,7 @@ public class Main {
     private static final String DOC_STATS_PATH = "data/doc-stats/stats.json";
     private static final String CHUNKED_FILE_PATH = "data/chunked-data/";
 
-    private static final int TOP_K = 1;
+    private static final int TOP_K = 10;
     private static final int RECORD_SIZE = 24;
 
     static String parsedFilePath = PARSED_FILE_PATH;
@@ -40,7 +40,7 @@ public class Main {
     private static int MIN_CHUNK_LENGTH = 20;
     private static double ALPHABET_RATIO = 0.5;
 
-    private static double TERM_FREQUENCY_SATURATION = 1.5;
+    private static double TERM_FREQUENCY_SATURATION = 1.2;
     private static double DOCUMENT_LENGTH_NORMALIZATION = 0.75;
 
     private static String chunkDataFilePath = "data/chunked-data/chunked_data.data";

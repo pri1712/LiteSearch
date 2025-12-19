@@ -26,7 +26,7 @@ public class IndexDecompression {
     public List<Map<Integer,Integer>> readCompressedIndex(Path indexfilePath, List<Long> tokenOffsets) throws IOException {
         //read data from the given offset, it returns a delta encoded list of docId and freq of the term in that docId.
         List<Map<Integer,Integer>> indexList = new ArrayList<>();
-        LOGGER.info("token offsets: " + tokenOffsets);
+        LOGGER.fine("token offsets: " + tokenOffsets);
         RandomAccessFile indexRAF = new RandomAccessFile(indexfilePath.toFile(), "r");
         for (var offset : tokenOffsets) {
             if (offset == null || offset < 0) {
