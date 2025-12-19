@@ -13,7 +13,7 @@ import java.util.logging.*;
 
 import com.pri1712.searchengine.utils.BatchFileWriter;
 import com.pri1712.searchengine.utils.TextUtils;
-import com.pri1712.searchengine.utils.WikiDocument;
+import com.pri1712.searchengine.model.ParsedDocument;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
@@ -22,7 +22,7 @@ public class Parser {
     private static final Logger LOGGER = Logger.getLogger(Parser.class.getName());
 
     private static final int MAX_BATCH_SIZE = 10;
-    private static final int MAX_DOCS_TO_PROCESS = 10000;
+    private static int MAX_DOCS_TO_PROCESS;
     private String XmlFilePath;
     private FileInputStream fis;
     private int docCounter = 0;
@@ -30,16 +30,16 @@ public class Parser {
     private int previousParseBatchCounter = 0;
     private final String parserBatchCheckpointFile = "parserCheckpoint.txt";
 
-    private final List<WikiDocument> writeBuffer = new ArrayList<>();
+    private final List<ParsedDocument> writeBuffer = new ArrayList<>();
 
     private final BatchFileWriter batchFileWriter = new BatchFileWriter("data/parsed-data/");
     private final CheckpointManager checkpointManager = new CheckpointManager(parserBatchCheckpointFile);
 
-    public Parser(String XmlFilePath) {
+    public Parser(String XmlFilePath, int MAX_DOCS_TO_PROCESS) {
         this.XmlFilePath = XmlFilePath;
         this.previousParseBatchCounter = checkpointManager.readCheckpointBatch();
+        Parser.MAX_DOCS_TO_PROCESS = MAX_DOCS_TO_PROCESS;
     }
-
 
     public void parseData() throws FileNotFoundException {
         if (XmlFilePath == null || XmlFilePath.isEmpty()) {
@@ -128,12 +128,12 @@ public class Parser {
 //                                    LOGGER.log(Level.WARNING,"Clean text is empty for title: {0)", cleanTitle.toString());
                                     break;
                                 }
-                                WikiDocument wikiDocument = new WikiDocument(ID.trim(),cleanTitle.toString().trim(),cleanText.toString(),timestamp.trim());
+                                ParsedDocument wikiDocument = new ParsedDocument(ID.trim(),cleanTitle.toString().trim(),cleanText.toString(),timestamp.trim());
                                 writeBuffer.add(wikiDocument);
                                 if (writeBuffer.size() >=  MAX_BATCH_SIZE) {
                                     //10k docs in the write buffer, need to write it to a file on disk.
 
-                                    List<WikiDocument> newWriteBuffer = new ArrayList<>(writeBuffer);
+                                    List<ParsedDocument> newWriteBuffer = new ArrayList<>(writeBuffer);
                                     writeBuffer.clear();
 //                                    LOGGER.info(String.format("Previous batch counter was %d and new batch counter is %d", previousParseBatchCounter, parseBatchCounter));
                                     if (previousParseBatchCounter == -1 || parseBatchCounter > previousParseBatchCounter) {

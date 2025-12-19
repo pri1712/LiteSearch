@@ -21,7 +21,7 @@ import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.model.data.Chunk;
 import com.pri1712.searchengine.utils.BatchFileWriter;
 import com.pri1712.searchengine.parser.CheckpointManager;
-import com.pri1712.searchengine.utils.WikiDocument;
+import com.pri1712.searchengine.model.ParsedDocument;
 import com.pri1712.searchengine.utils.TextUtils;
 import com.pri1712.searchengine.model.TokenizedData;
 
@@ -100,9 +100,9 @@ public class Tokenizer {
              GZIPInputStream gis = new GZIPInputStream(fis);
              BufferedReader buffRead = new BufferedReader(new InputStreamReader(gis))) {
 
-            List<WikiDocument> jsonDocuments = mapper.readValue(buffRead, new TypeReference<>() {
+            List<ParsedDocument> jsonDocuments = mapper.readValue(buffRead, new TypeReference<>() {
             });
-            for (WikiDocument wikiDocument : jsonDocuments) {
+            for (ParsedDocument wikiDocument : jsonDocuments) {
                 TokenizedData tokenizedText = TextUtils.tokenizeDocument(TextUtils.normalizeDocument(wikiDocument));
                 long docLength = tokenizedText.getLengthTokenizedText() + tokenizedText.getLengthTokenizedTitle();
                 perDocLengths.put(wikiDocument.getId(), docLength);

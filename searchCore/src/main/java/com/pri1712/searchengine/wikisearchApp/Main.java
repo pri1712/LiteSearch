@@ -18,8 +18,9 @@ import java.util.logging.Logger;
 
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    private static final String PARSED_FILE_PATH = "data/parsed-data/";
 
+    private static int MAX_DOCS_TO_PROCESS = 100;
+    private static final String PARSED_FILE_PATH = "data/parsed-data/";
     private static final String INDEXED_FILE_PATH = "data/inverted-index/";
     private static final String TOKEN_INDEX_OFFSET_PATH = "data/inverted-index/token_index_offset.json.gz";
     private static final String DOC_STATS_PATH = "data/doc-stats/stats.json";
@@ -91,7 +92,7 @@ public class Main {
 
     private static void runWritePipeline(String dataPath) {
         try {
-            Parser parser = new Parser(dataPath);
+            Parser parser = new Parser(dataPath,MAX_DOCS_TO_PROCESS);
             parser.parseData();
         } catch (Exception e) {
             throw new RuntimeException(e);

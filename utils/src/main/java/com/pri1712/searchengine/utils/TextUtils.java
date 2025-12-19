@@ -3,7 +3,7 @@ package com.pri1712.searchengine.utils;
 import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.model.TokenizedData;
 import com.pri1712.searchengine.model.data.Chunk;
-import com.pri1712.searchengine.utils.WikiDocument;
+import com.pri1712.searchengine.model.ParsedDocument;
 import org.tartarus.snowball.ext.PorterStemmer;
 
 import java.text.Normalizer;
@@ -55,9 +55,9 @@ public final class TextUtils {
         return new StringBuilder(normalizeString(raw));
     }
 
-    public static WikiDocument normalizeDocument(WikiDocument wikiDocument) {
+    public static ParsedDocument normalizeDocument(ParsedDocument wikiDocument) {
         if (wikiDocument == null) return null;
-        WikiDocument normalized = new WikiDocument();
+        ParsedDocument normalized = new ParsedDocument();
         normalized.setId(wikiDocument.getId());
         normalized.setTimestamp(wikiDocument.getTimestamp());
 
@@ -66,7 +66,7 @@ public final class TextUtils {
         return normalized;
     }
 
-    public static TokenizedData tokenizeDocument(WikiDocument wikiDocument) {
+    public static TokenizedData tokenizeDocument(ParsedDocument wikiDocument) {
         if (wikiDocument == null) return null;
 
         String originalText = wikiDocument.getText() == null ? "" : wikiDocument.getText();

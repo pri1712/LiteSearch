@@ -11,7 +11,7 @@ import com.pri1712.searchengine.model.BM25Stats;
 import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.model.data.Chunk;
 import com.pri1712.searchengine.model.params.ChunkParams;
-import com.pri1712.searchengine.utils.WikiDocument;
+import com.pri1712.searchengine.model.ParsedDocument;
 import com.pri1712.searchengine.tokenizer.Tokenizer;
 
 import java.io.*;
@@ -65,10 +65,10 @@ public class ChunkerEngine {
              GZIPInputStream gis = new GZIPInputStream(fis);
              BufferedReader buffRead = new BufferedReader(new InputStreamReader(gis))) {
 
-            List<WikiDocument> jsonDocuments = mapper.readValue(buffRead, new TypeReference<>() {
+            List<ParsedDocument> jsonDocuments = mapper.readValue(buffRead, new TypeReference<>() {
             });
 //            int docCount = 0;
-            for(WikiDocument wikiDocument : jsonDocuments) {
+            for(ParsedDocument wikiDocument : jsonDocuments) {
                 //do this per document in a document batch, each document batch is one of the parsed json files.
 //                docCount++;
                 String fullText = wikiDocument.getTitle() + " " + wikiDocument.getText();

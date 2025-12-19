@@ -1,17 +1,17 @@
-package com.pri1712.searchengine.utils;
+package com.pri1712.searchengine.model;
 
 import java.util.logging.*;
 
-public class WikiDocument {
-    private static final Logger LOGGER = Logger.getLogger(WikiDocument.class.getName());
+public class ParsedDocument {
+    private static final Logger LOGGER = Logger.getLogger(ParsedDocument.class.getName());
 
     private String id;
     private String title;
     private String text;
     private String timestamp;
 
-    public WikiDocument() {}
-    public WikiDocument(String id, String title, String text, String timestamp) {
+    public ParsedDocument() {}
+    public ParsedDocument(String id, String title, String text, String timestamp) {
         this.id = id;
         this.title = title;
         this.text = text;
@@ -23,6 +23,13 @@ public class WikiDocument {
 //                text.length(),
 //                timestamp
 //        ));
+    }
+
+    public ParsedDocument(String id, String title, String text){
+        this.id = id;
+        this.title = title;
+        this.text = text;
+        this.timestamp = null;
     }
 
     public String getTimestamp() {
