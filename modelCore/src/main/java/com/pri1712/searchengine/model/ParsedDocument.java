@@ -1,5 +1,6 @@
 package com.pri1712.searchengine.model;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.*;
 
@@ -31,6 +32,7 @@ public class ParsedDocument {
         this.title = title;
         this.text = text;
         this.timestamp = null;
+        this.metadata = new HashMap<>();
     }
 
     public String getTimestamp() {

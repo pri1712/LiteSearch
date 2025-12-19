@@ -5,8 +5,11 @@ import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.model.params.ChunkParams;
 import com.pri1712.searchengine.model.params.QueryParams;
 import com.pri1712.searchengine.model.params.RankingParams;
+import com.pri1712.searchengine.parser.DocumentParser;
 import com.pri1712.searchengine.parser.Parser;
 import com.pri1712.searchengine.indexreader.IndexReader;
+import com.pri1712.searchengine.parser.ParserFactory;
+import com.pri1712.searchengine.parser.SquadParser;
 import com.pri1712.searchengine.wikiquerying.QueryEngine;
 
 import java.io.IOException;
@@ -92,8 +95,8 @@ public class Main {
 
     private static void runWritePipeline(String dataPath) {
         try {
-            Parser parser = new Parser(dataPath,MAX_DOCS_TO_PROCESS);
-            parser.parseData();
+            DocumentParser documentParser = ParserFactory.createParser(dataPath,MAX_DOCS_TO_PROCESS,true,parsedFilePath);
+            documentParser.parse();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
