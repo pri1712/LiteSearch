@@ -130,9 +130,10 @@ public class ChunkerEngine {
             if (Character.isLetter(c)) alphaChars++;
         }
         double ratio = (double) alphaChars / length;
-        if (ratio < alphaRatio )  return false;
-
-
+        if (ratio < alphaRatio ) {
+            return false;
+        }
+        return true;
     }
 
     public void finish() throws IOException {
