@@ -127,7 +127,7 @@ public class QueryEngine {
                 double coverage = (double) matched / querySize; // [0,1]
                 double coverageBoost = 0.5 + coverage; // range: [0.5, 1.5]
                 int chunkLength = meta.getTokenCount();
-                double lengthPenalty = Math.min(1.0, avgChunkSize / chunkLength);
+                double lengthPenalty = chunkLength > 0 ? Math.min(1.0, avgChunkSize / chunkLength) : 1.0;
 
                 double finalScore = baseScore * coverageBoost * lengthPenalty;
 
