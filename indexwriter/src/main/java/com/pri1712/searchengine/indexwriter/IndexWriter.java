@@ -79,6 +79,12 @@ public class IndexWriter {
 
     //merge all the created inverted indexes.
     public void mergeAllIndexes(String indexFilePath) throws IOException {
+        if (!invertedIndex.isEmpty()) {
+            batchFileWriter.writeChunk(invertedIndex, indexFileCounter);
+            indexFileCounter++;
+            invertedIndex.clear();
+        }
+
         Path indexedPath = Paths.get(indexFilePath);
         Path tokenIndexOutputPath = indexedPath.resolve(String.format("token_index_offset.json.gz"));
 
@@ -97,11 +103,7 @@ public class IndexWriter {
                 List<Path> batch = indexFiles.subList(i, Math.min(i+MAX_FILE_STREAM, indexFiles.size()));
                 Path outputPath = indexedPath.resolve(String.format("merged_index%d_%03d.json.gz", indexRound, i / MAX_FILE_STREAM));
                 LOGGER.fine("Starting to merge indexed files; round " + indexRound);
-                if (indexFiles.size() > MAX_FILE_STREAM){
-                    mergeBatch(batch, outputPath);
-                } else {
-                    mergeBatch(batch, outputPath);
-                }
+                mergeBatch(batch, outputPath);
                 nextRoundIndexes.add(outputPath);
                 for (Path p : batch) Files.deleteIfExists(p);
             }
