@@ -3,7 +3,6 @@ package com.pri1712.searchengine.chunker;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pri1712.searchengine.model.ChunkConfiguration;
 import com.pri1712.searchengine.model.params.ChunkParams;
 import com.pri1712.searchengine.utils.BatchFileWriter;
 
@@ -48,7 +47,7 @@ public class Chunker {
     }
 
     public void startChunking() throws IOException {
-        ChunkerEngine chunkerEngine = new ChunkerEngine(new ChunkConfiguration(chunkSize,chunkOverlap),chunkDataFile,chunkIndexFile,indexedFilePath,docStatsPath);
+        ChunkerEngine chunkerEngine = new ChunkerEngine(chunkDataFile,chunkIndexFile,indexedFilePath,docStatsPath);
         //read from the parsed data and then chunk that data.
         try (Stream<Path> fileStream = Files.list(parsedPath).filter(f -> f.toString().endsWith(".json.gz"))) {
             fileStream.forEach(parsedFile -> {
@@ -62,19 +61,4 @@ public class Chunker {
         }
     }
 
-    public int getChunkOverlap() {
-        return chunkOverlap;
-    }
-
-    public void setChunkOverlap(int chunkOverlap) {
-        this.chunkOverlap = chunkOverlap;
-    }
-
-    public int getChunkSize() {
-        return chunkSize;
-    }
-
-    public void setChunkSize(int chunkSize) {
-        this.chunkSize = chunkSize;
-    }
 }

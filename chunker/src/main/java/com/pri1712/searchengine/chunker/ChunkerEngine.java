@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.model.BM25Stats;
-import com.pri1712.searchengine.model.ChunkConfiguration;
 import com.pri1712.searchengine.model.TokenizedChunk;
 import com.pri1712.searchengine.model.data.Chunk;
+import com.pri1712.searchengine.model.params.ChunkParams;
 import com.pri1712.searchengine.utils.WikiDocument;
 import com.pri1712.searchengine.tokenizer.Tokenizer;
 
@@ -24,11 +24,12 @@ import java.util.zip.GZIPInputStream;
 
 public class ChunkerEngine {
     private static final Logger LOGGER = Logger.getLogger(ChunkerEngine.class.getName());
-
-    private int chunkSize;
-    private int chunkOverlap;
+    private final int minChunkLength;
+    private final int chunkSize;
+    private final int chunkOverlap;
     private final RandomAccessFile chunkDataFile;
     private final RandomAccessFile chunkIndexFile;
+    private final double alphaRatio;
     private String indexFilePath;
     private String docStatsFilePath;
     private final BM25Stats stats;
@@ -44,9 +45,11 @@ public class ChunkerEngine {
     Tokenizer tokenizer = new Tokenizer();
     IndexWriter indexWriter;
 
-    public ChunkerEngine(ChunkConfiguration chunkConfiguration, RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile, String indexedFilePath, String docStatsPath) throws IOException {
-        this.chunkSize = chunkConfiguration.getChunkSize();
-        this.chunkOverlap = chunkConfiguration.getChunkOverlap();
+    public ChunkerEngine(RandomAccessFile chunkDataFile, RandomAccessFile chunkIndexFile, String indexedFilePath, String docStatsPath) throws IOException {
+        this.chunkSize = ChunkParams.getChunkSize();
+        this.chunkOverlap = ChunkParams.getChunkOverlap();
+        this.minChunkLength = ChunkParams.getMinChunkLength();
+        this.alphaRatio = ChunkParams.getAlphabetRatio();
         this.chunkDataFile = chunkDataFile;
         this.chunkIndexFile = chunkIndexFile;
         this.indexFilePath = indexedFilePath;
@@ -119,7 +122,18 @@ public class ChunkerEngine {
 
     private boolean validateText(String text) {
         if (text == null || text.isBlank()) return false;
-        if (text.length() <= MIN_)
+        int length = text.length();
+        if (length <= minChunkLength) return false;
+
+        int alphaChars = 0;
+        for (char c : text.toCharArray()) {
+            if (Character.isLetter(c)) alphaChars++;
+        }
+        double ratio = (double) alphaChars / length;
+        if (ratio < alphaRatio ) {
+            return false;
+        }
+        return true;
     }
 
     public void finish() throws IOException {
