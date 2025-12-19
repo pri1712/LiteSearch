@@ -8,6 +8,7 @@ import org.tartarus.snowball.ext.PorterStemmer;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -124,23 +125,32 @@ public final class TextUtils {
         return new TokenizedChunk(textTokens,chunk.getChunkId().toString());
     }
 
-    public static List<String> tokenizeQuery(List<String> tokens) {
-        if (tokens == null) return null;
-        List<String> tokenizedQuery = new ArrayList<>();
-        PorterStemmer stemmer = new PorterStemmer();
-        for (String entry : tokens) {
-            Matcher textMatcher = WORD_PATTERN.matcher(entry);
-            while (textMatcher.find()) {
-                if (entry.length() <= 1) continue;
-                String lower = entry.toLowerCase();
-                if (ENGLISH_STOP_WORDS.contains(lower)) continue;
-                stemmer.setCurrent(lower);
-                stemmer.stem();
-                String stemmed = stemmer.getCurrent();
-                LOGGER.fine(() -> "adding token to textTokens: " + stemmed);
-                tokenizedQuery.add(stemmed);
-            }
+    public static List<String> tokenizeQuery(String queryText) {
+        if (queryText == null || queryText.isEmpty()) {
+            return Collections.emptyList();
         }
-        return tokenizedQuery;
+
+        List<String> queryTokens = new ArrayList<>();
+        PorterStemmer stemmer = new PorterStemmer();
+
+        Matcher matcher = WORD_PATTERN.matcher(queryText);
+
+        while (matcher.find()) {
+            String token = matcher.group();
+            if (token.length() <= 1) continue;
+
+            String lower = token.toLowerCase();
+            if (ENGLISH_STOP_WORDS.contains(lower)) continue;
+
+            stemmer.setCurrent(lower);
+            stemmer.stem();
+            String stemmed = stemmer.getCurrent();
+
+            LOGGER.fine(() -> "adding token to queryTokens: " + stemmed);
+            queryTokens.add(stemmed);
+        }
+
+        LOGGER.fine("query tokens: " + queryTokens);
+        return queryTokens;
     }
 }

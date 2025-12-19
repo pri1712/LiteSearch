@@ -64,7 +64,7 @@ public class IndexReader {
         List<Long> tokenOffsets = new ArrayList<>();
         addTokenOffset(tokenOffset,tokenOffsets);
         List<Map<Integer,Integer>> decompressedPostingList = indexDecompression.readCompressedIndex(indexedFilePath,tokenOffsets);
-        LOGGER.info("decompressed posting list: " + decompressedPostingList);
+        LOGGER.fine("decompressed posting list: " + decompressedPostingList);
         LOGGER.info("Decompressed posting list size: " + decompressedPostingList.size());
         Map<Integer,Integer> postingMap = decompressedPostingList.get(0);
         for (var entry : postingMap.entrySet()) {
