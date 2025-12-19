@@ -26,12 +26,11 @@ public class ParsedDocument {
 //        ));
     }
 
-    public ParsedDocument(String id, String title, String text,Map<String,String> metadata) {
+    public ParsedDocument(String id, String title, String text) {
         this.id = id;
         this.title = title;
         this.text = text;
         this.timestamp = null;
-        this.metadata = metadata;
     }
 
     public String getTimestamp() {

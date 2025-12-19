@@ -70,11 +70,10 @@ public class SquadParser implements DocumentParser {
                         continue;
                     }
 
-                    // Create a document for each context paragraph
                     ParsedDocument doc = new ParsedDocument(
                             "squad_" + docId++,
-                            cleanTitle,
-                            cleanContext
+                            cleanTitle.toString(),
+                            cleanContext.toString()
                     );
                     doc.addMetadata("source", "squad");
                     doc.addMetadata("article_title", cleanTitle.toString());
@@ -119,8 +118,8 @@ public class SquadParser implements DocumentParser {
         return allDocuments;
     }
 
-            @Override
-            public String getParserName() {
-                return "SQuAD JSON Parser";
-            }
+    @Override
+    public String getParserName() {
+        return "SQuAD JSON Parser";
+    }
 }
