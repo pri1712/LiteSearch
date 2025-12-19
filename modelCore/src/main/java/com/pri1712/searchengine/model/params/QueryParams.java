@@ -8,10 +8,10 @@ public class QueryParams {
         QueryParams.RECORD_SIZE = RECORD_SIZE;
     }
 
-    public int getTOP_K() {
+    public static int getTOP_K() {
         return TOP_K;
     }
-    public int getRECORD_SIZE() {
+    public static int getRECORD_SIZE() {
         return RECORD_SIZE;
     }
 }
