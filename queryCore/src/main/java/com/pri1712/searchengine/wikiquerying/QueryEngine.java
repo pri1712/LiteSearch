@@ -121,6 +121,9 @@ public class QueryEngine {
                 ChunkMetaData meta = metadataMap.get(chunkId);
                 if (meta == null) continue;
                 int matched = matchedTerms.getOrDefault(chunkId, 0);
+                if (querySize <= 2 && matched < querySize) {
+                    continue;
+                }
                 double coverage = (double) matched / querySize; // [0,1]
                 double coverageBoost = 0.5 + coverage; // range: [0.5, 1.5]
                 int chunkLength = meta.getTokenCount();
