@@ -72,7 +72,7 @@ public class QueryEngine {
                 initParams();
             }
             List<String> tokens = preprocessQuery(query);
-            LOGGER.info("tokenized query: " + tokens);
+            LOGGER.fine("tokenized query: " + tokens);
             if (tokens.isEmpty()) return Collections.emptyList();
 
             List<IndexData> queryIndexData = indexReader.readTokenIndex(tokens);
@@ -149,7 +149,7 @@ public class QueryEngine {
     private Map<Integer, ChunkMetaData> fetchMetadataMap(Set<Integer> chunkIds) throws IOException {
         Map<Integer, ChunkMetaData> map = new HashMap<>();
 
-        LOGGER.info("RECORD SIZE: " + RECORD_SIZE);
+        LOGGER.fine("RECORD SIZE: " + RECORD_SIZE);
         for (int chunkId : chunkIds) {
             long positionInIndex = (long) chunkId * RECORD_SIZE;
 
@@ -211,7 +211,7 @@ public class QueryEngine {
         List<ChunkMetaData> result = new ArrayList<>();
         while (!pq.isEmpty()) {
             ScoredChunk polledElement = pq.poll();
-            LOGGER.info("Score is " + polledElement.getScore());
+            LOGGER.fine("Score is " + polledElement.getScore());
             result.add(0, polledElement.getChunkMetaData());
         }
         return result;

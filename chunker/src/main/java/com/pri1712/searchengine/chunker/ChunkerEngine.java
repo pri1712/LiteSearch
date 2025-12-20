@@ -105,11 +105,11 @@ public class ChunkerEngine {
                 long dataFilePointer = chunkDataFile.getFilePointer();
                 chunkDataFile.write(chunkBytes);
 
-                chunkIndexFile.writeInt(chunkId);
-                chunkIndexFile.writeLong(dataFilePointer);
-                chunkIndexFile.writeInt((int) chunkBytesLength);
-                chunkIndexFile.writeInt((int) Integer.parseInt(docId));
-                chunkIndexFile.writeInt(postProcessedTokenCount);
+                chunkIndexFile.writeInt(chunkId); //4 BYTES
+                chunkIndexFile.writeLong(dataFilePointer); //8 BYTES
+                chunkIndexFile.writeInt((int) chunkBytesLength);//4 BYTES
+                chunkIndexFile.writeInt((int) Integer.parseInt(docId));//4 BYTES
+                chunkIndexFile.writeInt(postProcessedTokenCount);//4 BYTES
 
             } catch (Exception ex) {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
