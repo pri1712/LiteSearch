@@ -1,6 +1,7 @@
 package com.pri1712.searchengine.wikisearchApp;
 
 import com.pri1712.searchengine.chunker.Chunker;
+import com.pri1712.searchengine.evaluator.RecallEvaluator;
 import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.model.params.ChunkParams;
 import com.pri1712.searchengine.model.params.ParsingParams;
@@ -75,7 +76,10 @@ public class Main {
                 LOGGER.log(Level.WARNING, "Failed closing index reader", e);
             }
         }));
-
+        if ("eval".equalsIgnoreCase(mode)) {
+            runEvalPipeline(indexReader,dataPath);
+            return;
+        }
         runReadPipeline(indexReader,indexedFilePath);
         long endTime = getEndTime();
         long elapsedTime = endTime - startTime;
@@ -154,7 +158,7 @@ public class Main {
                     QueryEngine queryEngine = new QueryEngine(indexReader,indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE);
                     List<String> relevantChunks = queryEngine.start(line);
                     LOGGER.info("relevant chunks: " + relevantChunks);
-
+                    queryEngine.close();
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, "Query failed", e);
                     System.out.println("Query error: " + e.getMessage());
@@ -167,6 +171,12 @@ public class Main {
         }
     }
 
+    private static void runEvalPipeline(IndexReader indexReader, String dataPath) throws IOException {
+        QueryEngine queryEngine = new QueryEngine(indexReader,indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE);
+        RecallEvaluator evaluator = new RecallEvaluator(queryEngine,TOP_K);
+        evaluator.runEvaluation(dataPath);
+        queryEngine.close();
+    }
     private static IndexReader openIndexReader(String indexPath) throws IOException {
         Path indexedPath = Paths.get(indexPath);
         LOGGER.info("Opening index at " + indexedPath.toAbsolutePath());

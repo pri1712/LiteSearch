@@ -19,6 +19,7 @@
         <module>queryCore</module>
         <module>modelCore</module>
         <module>chunker</module>
+        <module>Evaluator</module>
     </modules>
 
     <properties>
