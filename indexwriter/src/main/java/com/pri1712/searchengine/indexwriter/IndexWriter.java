@@ -36,7 +36,7 @@ public class IndexWriter {
     private static int indexFileCounter = 0;
 
     private static final int MAX_FILE_STREAM = 10;
-    private static final int MAX_IN_MEMORY_LENGTH = 10000;
+    private static final int MAX_IN_MEMORY_LENGTH = 1000;
 
     private BatchFileWriter batchFileWriter;
 
@@ -248,7 +248,6 @@ public class IndexWriter {
 
     private void addToIndex(TokenizedChunk tokenizedChunk) throws Exception {
         try {
-            LOGGER.fine("tokenize chunk text: " + tokenizedChunk.getTokenizedText());
             addChunk(tokenizedChunk);
             if (shouldFlush()) {
                 LOGGER.fine("Flushing to disk");

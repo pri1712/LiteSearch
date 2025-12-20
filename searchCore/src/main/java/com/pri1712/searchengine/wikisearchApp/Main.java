@@ -3,10 +3,14 @@ package com.pri1712.searchengine.wikisearchApp;
 import com.pri1712.searchengine.chunker.Chunker;
 import com.pri1712.searchengine.indexwriter.IndexWriter;
 import com.pri1712.searchengine.model.params.ChunkParams;
+import com.pri1712.searchengine.model.params.ParsingParams;
 import com.pri1712.searchengine.model.params.QueryParams;
 import com.pri1712.searchengine.model.params.RankingParams;
+import com.pri1712.searchengine.parser.DocumentParser;
 import com.pri1712.searchengine.parser.Parser;
 import com.pri1712.searchengine.indexreader.IndexReader;
+import com.pri1712.searchengine.parser.ParserFactory;
+import com.pri1712.searchengine.parser.SquadParser;
 import com.pri1712.searchengine.wikiquerying.QueryEngine;
 
 import java.io.IOException;
@@ -18,8 +22,11 @@ import java.util.logging.Logger;
 
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    private static final String PARSED_FILE_PATH = "data/parsed-data/";
 
+    private static int MAX_DOCS_TO_PROCESS = 100000;
+    private static int MAX_BATCH_SIZE = 10;
+
+    private static final String PARSED_FILE_PATH = "data/parsed-data/";
     private static final String INDEXED_FILE_PATH = "data/inverted-index/";
     private static final String TOKEN_INDEX_OFFSET_PATH = "data/inverted-index/token_index_offset.json.gz";
     private static final String DOC_STATS_PATH = "data/doc-stats/stats.json";
@@ -90,15 +97,16 @@ public class Main {
     }
 
     private static void runWritePipeline(String dataPath) {
+        initParams();
         try {
-            Parser parser = new Parser(dataPath);
-            parser.parseData();
+            DocumentParser documentParser = ParserFactory.createParser(dataPath,MAX_DOCS_TO_PROCESS,true,parsedFilePath);
+            LOGGER.log(Level.INFO,"Parsing data : {0}",parsedFilePath);
+            documentParser.parse();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         try {
-            initParams();
             Chunker chunker = new Chunker(parsedFilePath, chunkedFilePath, chunkDataFilePath, chunkIndexFilePath,indexedFilePath, docStatsPath );
             chunker.startChunking();
         } catch (IOException e) {
@@ -168,6 +176,7 @@ public class Main {
     }
 
     private static void initParams() {
+        new ParsingParams(MAX_DOCS_TO_PROCESS,MAX_BATCH_SIZE);
         new ChunkParams(CHUNK_SIZE, CHUNK_OVERLAP, MIN_CHUNK_LENGTH, ALPHABET_RATIO);
         new RankingParams(TERM_FREQUENCY_SATURATION,DOCUMENT_LENGTH_NORMALIZATION);
         new QueryParams(TOP_K,RECORD_SIZE);
