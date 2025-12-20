@@ -72,7 +72,7 @@ public class ChunkerEngine {
                 //do this per document in a document batch, each document batch is one of the parsed json files.
 //                docCount++;
                 String fullText = parsedDocument.getTitle() + " " + parsedDocument.getText();
-
+                LOGGER.log(Level.FINE, "Processing text: " + fullText);
                 chunkText(fullText, parsedDocument.getId());
             }
 //            LOGGER.log(Level.INFO, "Processed " + docCount + " documents");
