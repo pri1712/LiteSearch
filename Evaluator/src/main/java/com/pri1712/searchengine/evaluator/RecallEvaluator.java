@@ -6,6 +6,7 @@ import com.pri1712.searchengine.wikiquerying.QueryEngine;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class RecallEvaluator {
     private final QueryEngine queryEngine;
@@ -39,12 +40,14 @@ public class RecallEvaluator {
                             validAnswers.add(ans.get("text").asText().toLowerCase());
                         }
                         List<String> results = queryEngine.start(question);
+                        if (results == null || results.isEmpty()) continue;
                         totalQuestions++;
 
                         boolean isHit = checkForHit(results, validAnswers);
 
                         if (isHit) {
                             successfulHits++;
+                            System.out.println("hit count: " + successfulHits);
                         } else {
                             logFailure(writer, question, validAnswers, results);
                         }
@@ -82,8 +85,9 @@ public class RecallEvaluator {
 
     private boolean checkForHit(List<String> results, List<String> validAnswers) {
         for (String res : results) {
+            String resLowerCase = res.trim().toLowerCase();
             for (String ans : validAnswers) {
-                if (res.contains(ans)) return true;
+                if (resLowerCase.contains(ans)) return true;
             }
         }
         return false;

@@ -158,7 +158,7 @@ public class Main {
                     QueryEngine queryEngine = new QueryEngine(indexReader,indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE);
                     List<String> relevantChunks = queryEngine.start(line);
                     LOGGER.info("relevant chunks: " + relevantChunks);
-
+                    queryEngine.close();
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, "Query failed", e);
                     System.out.println("Query error: " + e.getMessage());
@@ -175,6 +175,7 @@ public class Main {
         QueryEngine queryEngine = new QueryEngine(indexReader,indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE);
         RecallEvaluator evaluator = new RecallEvaluator(queryEngine,TOP_K);
         evaluator.runEvaluation(dataPath);
+        queryEngine.close();
     }
     private static IndexReader openIndexReader(String indexPath) throws IOException {
         Path indexedPath = Paths.get(indexPath);

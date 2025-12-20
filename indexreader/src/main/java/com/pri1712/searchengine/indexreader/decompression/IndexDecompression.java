@@ -42,7 +42,7 @@ public class IndexDecompression {
                 indexList.add(Map.of());
             }
             Map<Integer,Integer> decodedIndexLine = parsePostingsLine(decodedLine);
-            LOGGER.info(decodedIndexLine.toString());
+            LOGGER.fine(decodedIndexLine.toString());
             indexList.add(decodedIndexLine);
         }
         return indexList;
@@ -72,6 +72,16 @@ public class IndexDecompression {
 
     private static Map<Integer,Integer> parsePostingsLine(String line) throws JsonProcessingException {
         LOGGER.fine("Parsing postings line: " + line);
+        if (line == null || line.trim().isEmpty()) {
+            return Map.of();
+        }
+        String[] parts = line.split(":", 2);
+
+        if (parts.length < 2 || parts[1] == null || parts[1].trim().isEmpty()) {
+            // Log it so you know which token is broken
+            LOGGER.warning("Skipping malformed index line for token: " + (parts.length > 0 ? parts[0] : "UNKNOWN"));
+            return Map.of();
+        }
         Map<String,Map<String,Integer>> tokenIndexList = mapper.readValue(line, new TypeReference<>() {
         });
         if (tokenIndexList.isEmpty()){
