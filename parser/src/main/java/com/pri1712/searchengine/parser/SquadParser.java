@@ -110,11 +110,7 @@ public class SquadParser implements DocumentParser {
     /**
      * Unified logic to write batches. Handles both checkpointed and non-checkpointed runs.
      */
-    private void processBatch(List<ParsedDocument> buffer,
-                              BatchFileWriter batchWriter,
-                              CheckpointManager checkpointManager,
-                              int previousParseBatchCounter,
-                              int currentParseBatchCounter) throws IOException {
+    private void processBatch(List<ParsedDocument> buffer, BatchFileWriter batchWriter, CheckpointManager checkpointManager, int previousParseBatchCounter, int currentParseBatchCounter) throws IOException {
 
         if (buffer.isEmpty()) return;
         boolean shouldWrite = !enableCheckpoint || (previousParseBatchCounter == -1 || currentParseBatchCounter > previousParseBatchCounter);

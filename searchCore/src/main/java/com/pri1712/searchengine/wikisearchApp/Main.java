@@ -7,10 +7,8 @@ import com.pri1712.searchengine.model.params.ParsingParams;
 import com.pri1712.searchengine.model.params.QueryParams;
 import com.pri1712.searchengine.model.params.RankingParams;
 import com.pri1712.searchengine.parser.DocumentParser;
-import com.pri1712.searchengine.parser.Parser;
 import com.pri1712.searchengine.indexreader.IndexReader;
 import com.pri1712.searchengine.parser.ParserFactory;
-import com.pri1712.searchengine.parser.SquadParser;
 import com.pri1712.searchengine.wikiquerying.QueryEngine;
 
 import java.io.IOException;
@@ -99,7 +97,7 @@ public class Main {
     private static void runWritePipeline(String dataPath) {
         initParams();
         try {
-            DocumentParser documentParser = ParserFactory.createParser(dataPath,MAX_DOCS_TO_PROCESS,true,parsedFilePath);
+            DocumentParser documentParser = ParserFactory.createParser(dataPath, true,parsedFilePath);
             LOGGER.log(Level.INFO,"Parsing data : {0}",parsedFilePath);
             documentParser.parse();
         } catch (Exception e) {

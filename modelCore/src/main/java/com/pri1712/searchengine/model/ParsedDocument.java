@@ -25,6 +25,7 @@ public class ParsedDocument {
 //                text.length(),
 //                timestamp
 //        ));
+        this.metadata = new HashMap<>();
     }
 
     public ParsedDocument(String id, String title, String text) {
