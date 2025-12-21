@@ -6,6 +6,8 @@
 
 Perfect for **Raspberry Pi**, old laptops, embedded systems, personal knowledge bases, and cost-optimized cloud deployments.
 
+**Current Support** : Since this is the alpha release, the focus is on quantifying performance for a single dataset, and hence we only support SQuAD2.0 data for indexing and search. This is a known issue and support to other data types will be extended in further releases.
+
 ---
 
 ## Why LiteRAG?
