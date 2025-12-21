@@ -70,51 +70,44 @@ public class IndexDecompression {
         return baos.toString(StandardCharsets.UTF_8);
     }
 
-    private static Map<Integer,Integer> parsePostingsLine(String line) throws JsonProcessingException {
+    private static Map<Integer, Integer> parsePostingsLine(String line) throws JsonProcessingException {
         LOGGER.fine("Parsing postings line: " + line);
         if (line == null || line.trim().isEmpty()) {
             return Map.of();
         }
-        String[] parts = line.split(":", 2);
 
-        if (parts.length < 2 || parts[1] == null || parts[1].trim().isEmpty()) {
-            // Log it so you know which token is broken
-            LOGGER.warning("Skipping malformed index line for token: " + (parts.length > 0 ? parts[0] : "UNKNOWN"));
+        Map<String, List<Integer>> tokenIndexList;
+        try {
+            tokenIndexList = mapper.readValue(line, new TypeReference<Map<String, List<Integer>>>() {});
+        } catch (JsonProcessingException e) {
+            LOGGER.warning("Failed to parse JSON line: " + line.substring(0, Math.min(line.length(), 50)));
             return Map.of();
         }
-        Map<String,Map<String,Integer>> tokenIndexList = mapper.readValue(line, new TypeReference<>() {
-        });
-        if (tokenIndexList.isEmpty()){
+
+        if (tokenIndexList == null || tokenIndexList.isEmpty()){
             return Map.of();
         }
-        Map<String,Integer> postingList = tokenIndexList.values().iterator().next(); //docid -> freq list.
-        if (postingList.isEmpty()){
+        List<Integer> postingList = tokenIndexList.values().iterator().next();
+
+        if (postingList == null || postingList.isEmpty()){
             return Map.of();
         }
         return decodeDeltaEncoding(postingList);
     }
 
-    private static Map<Integer,Integer> decodeDeltaEncoding(Map<String,Integer> postingList) {
-        Map<Integer,Integer> decodedPostings = new LinkedHashMap<>();
-        boolean first = true;
-        int prevKey = 0;
-        for (Map.Entry<String,Integer> entry : postingList.entrySet()) {
-            String keyStr = entry.getKey();
-            Integer value = entry.getValue() == null ? 0 : entry.getValue();
-            int key = 0;
-            try {
-                key = Integer.parseInt(keyStr);
-            } catch (NumberFormatException e) {
-                LOGGER.warning(e.getMessage());
-            }
-            if (first) {
-                first = false;
-                prevKey = key;
-                decodedPostings.put(prevKey,value);
-            } else {
-                prevKey += key;
-                decodedPostings.put(prevKey,value); //decoding delta compressed data.
-            }
+    private static Map<Integer, Integer> decodeDeltaEncoding(List<Integer> postingList) {
+        Map<Integer, Integer> decodedPostings = new LinkedHashMap<>();
+        if (postingList == null || postingList.isEmpty()) {
+            return decodedPostings;
+        }
+
+        int currentDocId = 0;
+        // The list is interleaved: [delta1, freq1, delta2, freq2, ...]
+        for (int i = 0; i < postingList.size(); i += 2) {
+            int delta = postingList.get(i);
+            int frequency = (i + 1 < postingList.size()) ? postingList.get(i + 1) : 0;
+            currentDocId += delta;
+            decodedPostings.put(currentDocId, frequency);
         }
         return decodedPostings;
     }

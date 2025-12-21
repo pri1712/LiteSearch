@@ -84,7 +84,7 @@ public class QueryEngine {
 
             Set<Integer> uniqueChunkIds = new HashSet<>();
             for (IndexData data : queryIndexData) {
-                LOGGER.info("chunkIds: " + data.getIds());
+                LOGGER.finest("chunkIds: " + data.getIds());
                 uniqueChunkIds.addAll(data.getIds());
             }
 
@@ -228,7 +228,7 @@ public class QueryEngine {
             byte[] buffer = new byte[meta.getDataLength()];
             try {
                 chunkDataFile.readFully(buffer);
-                LOGGER.info("data read is: " + new String(buffer));
+                LOGGER.finest("data read is: " + new String(buffer));
                 chunks.add(new String(buffer, StandardCharsets.UTF_8));
             } catch (EOFException e) {
                 LOGGER.warning("Unexpected EOF reading chunk at offset: " + meta.getDataOffset());

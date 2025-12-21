@@ -280,7 +280,6 @@ public class IndexWriter {
     private void addChunk(TokenizedChunk tokenizedChunk) {
         List<String> chunkText = tokenizedChunk.getTokenizedText();
         String chunkId = tokenizedChunk.getChunkId();
-        LOGGER.info("Adding chunk " + chunkId + " to index, text is " + chunkText);
         //in chunks the title and text is all treated as a chunk itself, there is no distinction while tokenizing it.
         for (String token : chunkText) {
             invertedIndex

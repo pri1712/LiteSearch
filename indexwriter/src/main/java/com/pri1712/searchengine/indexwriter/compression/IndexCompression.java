@@ -12,10 +12,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -46,21 +43,30 @@ public class IndexCompression {
             String line;
             while ((line = br.readLine()) != null){
                 Map<String, Map<Integer,Integer>> index = mapper.readValue(line, new TypeReference<>() {});
+
                 for (var e : index.entrySet()) {
                     String token = e.getKey();
                     Map<Integer,Integer> docFreqMap = e.getValue();
-                    Map<Integer, Integer> deltaMap = new LinkedHashMap<>();
                     List<Integer> docIDs = new ArrayList<>(docFreqMap.keySet());
+                    if (docIDs.isEmpty()) continue;
+                    List<Integer> flatDeltaList = new ArrayList<>(docIDs.size() * 2);
+
                     int firstDocID = docIDs.get(0);
                     int prevDocID = firstDocID;
-                    deltaMap.put(firstDocID, docFreqMap.get(firstDocID));
-                    for (int i = 1; i<docIDs.size(); i++) {
+
+                    flatDeltaList.add(firstDocID);
+                    flatDeltaList.add(docFreqMap.get(firstDocID));
+
+                    for (int i = 1; i < docIDs.size(); i++) {
                         int currentDocID = docIDs.get(i);
                         int delta = currentDocID - prevDocID;
-                        deltaMap.put(delta, docFreqMap.get(currentDocID));
+
+                        flatDeltaList.add(delta);
+                        flatDeltaList.add(docFreqMap.get(currentDocID));
+
                         prevDocID = currentDocID;
                     }
-                    byte[] jsonBytes = mapper.writeValueAsBytes(Map.of(token,deltaMap));
+                    byte[] jsonBytes = mapper.writeValueAsBytes(Map.of(token, flatDeltaList));
                     tokenOffsets.put(token, byteOffset);
                     bos.write(jsonBytes);
                     bos.write('\n');
