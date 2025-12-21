@@ -31,7 +31,7 @@ public class Main {
     private static final String DOC_STATS_PATH = "data/doc-stats/stats.json";
     private static final String CHUNKED_FILE_PATH = "data/chunked-data/";
 
-    private static final int TOP_K = 5;
+    private static final int TOP_K = 10;
     private static final int RECORD_SIZE = 24;
 
     static String parsedFilePath = PARSED_FILE_PATH;
@@ -42,8 +42,8 @@ public class Main {
     static String chunkedFilePath = CHUNKED_FILE_PATH;
 
     private static int CHUNK_SIZE = 512; //in tokens, 1 word = ~0.75 token
-    private static int CHUNK_OVERLAP = 55;
-    private static int MIN_CHUNK_LENGTH = 20;
+    private static int CHUNK_OVERLAP = 100;
+    private static int MIN_CHUNK_LENGTH = 10;
     private static double ALPHABET_RATIO = 0.5;
 
     private static double TERM_FREQUENCY_SATURATION = 1.2;
@@ -52,7 +52,8 @@ public class Main {
     private static String chunkDataFilePath = "data/chunked-data/chunked_data.data";
     private static String chunkIndexFilePath = "data/chunked-data/chunked_index.bin";
 
-    private static int MAX_DOCS_EVALUATE = 100;
+    private static int MAX_DOCS_EVALUATE = 20;
+
     public static void main(String[] args) throws IOException {
         long startTime = getStartTime();
         Map<String,String> parsedArgs = parseArgs(args);
@@ -174,8 +175,9 @@ public class Main {
 
     private static void runEvalPipeline(IndexReader indexReader, String dataPath) throws IOException {
         QueryEngine queryEngine = new QueryEngine(indexReader,indexedFilePath, docStatsPath, tokenIndexOffsetPath, TOP_K, chunkDataFilePath, chunkIndexFilePath, RECORD_SIZE);
-        RecallEvaluator evaluator = new RecallEvaluator(queryEngine,TOP_K, MAX_DOCS_EVALUATE );
-        evaluator.runEvaluation(dataPath);
+        RecallEvaluator evaluator = new RecallEvaluator(queryEngine, MAX_DOCS_EVALUATE );
+        int[] topKValues = {1,5,10,15};
+        evaluator.runMultiTopKEvaluation(dataPath, topKValues);
         queryEngine.close();
     }
     private static IndexReader openIndexReader(String indexPath) throws IOException {
