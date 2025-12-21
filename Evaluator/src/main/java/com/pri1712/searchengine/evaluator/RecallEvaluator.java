@@ -6,8 +6,10 @@ import com.pri1712.searchengine.wikiquerying.QueryEngine;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class RecallEvaluator {
+    private static Logger LOGGER = Logger.getLogger(RecallEvaluator.class.getName());
     private final QueryEngine queryEngine;
     private final String FAILURE_LOG = "retrieval_failures.csv";
     private int TOP_K;
@@ -92,7 +94,9 @@ public class RecallEvaluator {
     private boolean checkForHit(List<String> results, List<String> validAnswers) {
         for (String res : results) {
             String resLowerCase = res.trim().toLowerCase();
+            LOGGER.info("resLowerCase: " + resLowerCase);
             for (String ans : validAnswers) {
+                LOGGER.info("ans " + ans);
                 if (resLowerCase.contains(ans)) return true;
             }
         }
