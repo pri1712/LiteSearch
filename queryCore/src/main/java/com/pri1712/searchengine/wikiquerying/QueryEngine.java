@@ -122,19 +122,24 @@ public class QueryEngine {
                 ChunkMetaData meta = metadataMap.get(chunkId);
                 if (meta == null) continue;
                 int matched = matchedTerms.getOrDefault(chunkId, 0);
-                if (querySize <= 1 && matched < querySize) {
-                    continue;
+
+                if (querySize >= 2) {
+                    double matchRatio = (double) matched / querySize;
+                    if (matchRatio < 0.5) {
+                        continue;
+                    }
                 }
                 double coverage = (double) matched / querySize;
-                double coverageBoost = 0.5 + coverage;
-                int chunkLength = meta.getTokenCount();
-                double lengthPenalty = chunkLength > 0 ? Math.min(1.0, avgChunkSize / chunkLength) : 1.0;
+                double coverageBoost = 1.0 + (0.3 * coverage);
+                double termDensity = (double) matched / meta.getTokenCount();
+                double densityBoost = 1.0 + Math.min(0.2, termDensity * 10);
+                double proximityBoost = calculateProximityBoostSimple(chunkId,tokens,metadataMap);
 
-                double finalScore = baseScore * coverageBoost * lengthPenalty;
+                double finalScore = baseScore * coverageBoost * densityBoost * proximityBoost;
 
                 allScoredChunks.add(new ScoredChunk(finalScore, chunkId, meta));
             }
-            List<ChunkMetaData> topKMetadata = filterTOPK(allScoredChunks);
+            List<ChunkMetaData> topKMetadata = filterTopKWithDeduplication(allScoredChunks);
 
             return getChunkData(topKMetadata);
 
@@ -165,7 +170,7 @@ public class QueryEngine {
             int dataLength = chunkIndexFile.readInt();
             int docId = chunkIndexFile.readInt();
             int tokenCount = chunkIndexFile.readInt();
-            LOGGER.fine("CHUNK_ID: " + chunkId +
+            LOGGER.finest("CHUNK_ID: " + chunkId +
                     " | DATA FILE OFFSET: " + dataOffset +
                     " | CHUNK LENGTH BYTES: " + dataLength +
                     " | TOKENS: " + tokenCount);
@@ -218,6 +223,34 @@ public class QueryEngine {
         return result;
     }
 
+    /*
+    Handles deduplication by recording docId of chunks, allowing only one chunk per DocId in the final results.
+     */
+    private List<ChunkMetaData> filterTopKWithDeduplication(List<ScoredChunk> scoredChunkList) {
+        scoredChunkList.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
+
+        List<ChunkMetaData> result = new ArrayList<>();
+        Set<Integer> usedDocIds = new HashSet<>();
+
+        for (ScoredChunk chunk : scoredChunkList) {
+            LOGGER.info("Score is " + chunk.getScore() + "for chunkID: " + chunk.getChunkId());
+            int docId = chunk.getChunkMetaData().getDocId();
+            if (!usedDocIds.contains(docId)) {
+                LOGGER.fine("Score: " + chunk.getScore() + " | DocId: " + docId);
+                result.add(chunk.getChunkMetaData());
+                usedDocIds.add(docId);
+
+                if (result.size() >= TOP_K) {
+                    break;
+                }
+            } else {
+                LOGGER.finest("Skipped duplicate docId: " + docId + " (overlap)");
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Reads the actual text content from the chunks.data file.
      */
@@ -252,5 +285,31 @@ public class QueryEngine {
     public void close() throws IOException {
         if (chunkIndexFile != null) chunkIndexFile.close();
         if (chunkDataFile != null) chunkDataFile.close();
+    }
+
+    private double calculateProximityBoostSimple(int chunkId, List<String> queryTokens,
+                                                 Map<Integer, ChunkMetaData> metadataMap) {
+        if (queryTokens.size() <= 1) return 1.0;
+
+        // Without position data, we can only estimate based on:
+        // 1. Term frequency - if terms appear multiple times, more likely to be close
+        // 2. Chunk size - smaller chunks mean terms are inherently closer
+
+        ChunkMetaData meta = metadataMap.get(chunkId);
+        if (meta == null) return 1.0;
+
+        int chunkSize = meta.getTokenCount();
+
+        // Smaller chunks get a small proximity boost
+        // Rationale: In a 100-token chunk, 3 terms are likely closer than in a 500-token chunk
+        if (chunkSize < 100) {
+            return 1.15;
+        } else if (chunkSize < 200) {
+            return 1.10;
+        } else if (chunkSize < 300) {
+            return 1.05;
+        }
+
+        return 1.0;
     }
 }
