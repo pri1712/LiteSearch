@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-    private static int MAX_DOCS_TO_PROCESS = 100000;
+    private static int MAX_DOCS_TO_PROCESS = 100;
     private static int MAX_BATCH_SIZE = 10;
 
     private static final String PARSED_FILE_PATH = "data/parsed-data/";
@@ -31,7 +31,7 @@ public class Main {
     private static final String DOC_STATS_PATH = "data/doc-stats/stats.json";
     private static final String CHUNKED_FILE_PATH = "data/chunked-data/";
 
-    private static final int TOP_K = 5;
+    private static final int TOP_K = 99;
     private static final int RECORD_SIZE = 24;
 
     static String parsedFilePath = PARSED_FILE_PATH;

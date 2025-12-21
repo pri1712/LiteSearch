@@ -72,7 +72,7 @@ public class QueryEngine {
                 initParams();
             }
             List<String> tokens = preprocessQuery(query);
-            LOGGER.fine("tokenized query: " + tokens);
+            LOGGER.info("tokenized query: " + tokens);
             if (tokens.isEmpty()) return Collections.emptyList();
 
             List<IndexData> queryIndexData = indexReader.readTokenIndex(tokens);
@@ -84,6 +84,7 @@ public class QueryEngine {
 
             Set<Integer> uniqueChunkIds = new HashSet<>();
             for (IndexData data : queryIndexData) {
+                LOGGER.info("chunkIds: " + data.getIds());
                 uniqueChunkIds.addAll(data.getIds());
             }
 
@@ -227,6 +228,7 @@ public class QueryEngine {
             byte[] buffer = new byte[meta.getDataLength()];
             try {
                 chunkDataFile.readFully(buffer);
+                LOGGER.info("data read is: " + new String(buffer));
                 chunks.add(new String(buffer, StandardCharsets.UTF_8));
             } catch (EOFException e) {
                 LOGGER.warning("Unexpected EOF reading chunk at offset: " + meta.getDataOffset());
