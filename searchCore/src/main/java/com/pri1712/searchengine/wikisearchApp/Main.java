@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class Main {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-    private static int MAX_DOCS_TO_PROCESS = 10000;
+    private static int MAX_DOCS_TO_PROCESS = 100000;
     private static int MAX_BATCH_SIZE = 10;
 
     private static final String PARSED_FILE_PATH = "data/parsed-data/";
