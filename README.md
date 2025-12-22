@@ -1,4 +1,4 @@
-# LiteRAG 🚀
+# LiteRAG
 
 > Memory-efficient document retrieval system designed for edge devices and resource-constrained environments
 
