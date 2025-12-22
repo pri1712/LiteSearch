@@ -11,13 +11,13 @@ Perfect for **Raspberry Pi**, old laptops, embedded systems, personal knowledge 
 ---
 ## Usage
 
-# Download the jar
+### Download the jar
 wget https://github.com/pri1712/LiteRAG/releases/download/v0.1.0-alpha/liteRAG-0.1.0-alpha.jar
 
-# Index the Squad Dataset
+### Index the Squad Dataset
 java -Xmx512M -jar liteRAG-0.1.0-alpha.jar --mode=write --data=<path to squad dataset>
 
-# Search
+### Search
 java -Xmx512M -jar liteRAG-0.1.0-alpha.jar --mode=read --data=<path to squad dataset>
 
 ## Why LiteRAG?
