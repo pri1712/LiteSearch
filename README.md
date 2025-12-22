@@ -9,6 +9,16 @@ Perfect for **Raspberry Pi**, old laptops, embedded systems, personal knowledge 
 **Current Support** : Since this is the alpha release, the focus is on quantifying performance for a single dataset, and hence we only support SQuAD2.0 data for indexing and search. This is a known issue and support to other data types will be extended in further releases.
 
 ---
+## Usage
+
+# Download the jar
+wget https://github.com/pri1712/LiteRAG/releases/download/v0.1.0-alpha/liteRAG-0.1.0-alpha.jar
+
+# Index the Squad Dataset
+java -Xmx512M -jar liteRAG-0.1.0-alpha.jar --mode=write --data=<path to squad dataset>
+
+# Search
+java -Xmx512M -jar liteRAG-0.1.0-alpha.jar --mode=read --data=<path to squad dataset>
 
 ## Why LiteRAG?
 
