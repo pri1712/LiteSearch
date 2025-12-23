@@ -1,8 +1,8 @@
-# LiteRAG
+# LiteSearch
 
 > Memory-efficient document retrieval system designed for edge devices and resource-constrained environments
 
-**LiteRAG** is a lightweight document retrieval system built for scenarios where resources are limited. Unlike traditional RAG systems requiring 4-8GB RAM, **LiteRAG delivers 74% recall@15 using only 512MB heap space** through optimized BM25 lexical search with custom scoring enhancements.
+**LiteSearch** is a lightweight document retrieval system built for scenarios where resources are limited. Unlike traditional info retrieval systems requiring 4-8GB RAM, **LiteSearch delivers 74% recall@15 using only 512MB heap space** through optimized BM25 lexical search with custom scoring enhancements.
 
 Perfect for **Raspberry Pi**, old laptops, embedded systems, personal knowledge bases, and cost-optimized cloud deployments.
 
@@ -12,7 +12,7 @@ Perfect for **Raspberry Pi**, old laptops, embedded systems, personal knowledge 
 ## Usage
 
 ### Download the jar
-wget https://github.com/pri1712/LiteRAG/releases/download/v0.1.0-alpha/liteRAG-0.1.0-alpha.jar
+wget https://github.com/pri1712/LiteSearch/releases/download/v0.1.0-alpha/liteRAG-0.1.0-alpha.jar
 
 ### Index the Squad Dataset
 java -Xmx512M -jar liteRAG-0.1.0-alpha.jar --mode=write --data={path to squad dataset}
@@ -20,15 +20,15 @@ java -Xmx512M -jar liteRAG-0.1.0-alpha.jar --mode=write --data={path to squad da
 ### Search
 java -Xmx512M -jar liteRAG-0.1.0-alpha.jar --mode=read --data={path to squad dataset}
 
-## Why LiteRAG?
+## Why LiteSearch?
 
 ### The Problem
 
-Modern RAG systems are resource-hungry and complex, and involve complex set up pipelines.
+Modern info retrieval systems are resource-hungry and complex, and involve complex set up pipelines.
 
 ### The Solution
 
-**LiteRAG uses pure BM25 lexical search** with intelligent optimizations:
+**LiteSearch uses pure BM25 lexical search** with intelligent optimizations:
 
 #### Ultra-Low Memory Footprint
 - **512MB heap space** for 100K documents
@@ -68,7 +68,7 @@ Evaluated on **SQuAD 2.0** (11,873 questions):
 
 #### Intelligent Scoring
 
-Beyond vanilla BM25, LiteRAG adds:
+Beyond vanilla BM25, LiteSearch adds:
 - **Coverage Boost** (1.0-1.3×): Rewards chunks matching more query terms
 - **Density Boost** (1.0-1.2×): Prioritizes higher term concentration
 - **Proximity Boost** (1.0-1.5×): Values terms appearing close together
@@ -108,17 +108,17 @@ TOP_K      | Recall@K   | Precision@K | MRR        | Avg Rank
 **Comparison to Other Systems on SQuAD:**
 - Dense Passage Retrieval (DPR): ~78-82% recall@10 (but needs 6GB+ RAM)
 - BM25 (Elasticsearch): ~75-80% recall@10 (needs 2-3GB RAM)
-- **LiteRAG**: ~73% recall@10 (only 512MB RAM)
+- **LiteSearch**: ~73% recall@10 (only 512MB RAM)
 
 ### Setup Time Comparison
 
 | System | Time to Index 100K Docs | Time to First Query |
 |--------|-------------------------|---------------------|
-| **LiteRAG** | 10 minutes | 2 seconds |
+| **LiteSearch** | 10 minutes | 2 seconds |
 | Elasticsearch | 15-20 minutes | 30 seconds (cluster startup) |
 | Custom FAISS | 45-60 minutes | 5-10 seconds (model loading) |
 
-**LiteRAG advantages:**
+**LiteSearch advantages:**
 - No Docker/container setup
 - No configuration files needed
 - No model downloads
@@ -127,7 +127,7 @@ TOP_K      | Recall@K   | Precision@K | MRR        | Avg Rank
 
 ---
 
-## When to Choose LiteRAG
+## When to Choose LiteSearch
 
 ### Perfect For:
 
